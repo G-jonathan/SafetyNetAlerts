@@ -1,8 +1,23 @@
 package com.openClassroomsProject.SafetyNetAlerts.model;
 
 import lombok.Data;
-import javax.persistence.*;
 
+@Data
+public class Person {
+    private String firstName;
+    private String lastName;
+    private String address;
+    private String city;
+    private String zip;
+    private String phone;
+    private String email;
+}
+
+
+
+
+
+/*
 @Data
 @Entity
 @Table(name="person")
@@ -20,3 +35,4 @@ public class Person {
     private int phone;
     private String email;
 }
+*/
