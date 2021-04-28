@@ -1,14 +1,8 @@
 package com.openClassroomsProject.SafetyNetAlerts.model;
 
 import lombok.Data;
+import javax.persistence.*;
 
-@Data
-public class Firestation {
-    private String address;
-    private String station;
-}
-
-/*
 @Data
 @Entity
 @Table(name="firestation")
@@ -17,7 +11,5 @@ public class Firestation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String address;
-    private int station;
+    private String station;
 }
-
- */

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openClassroomsProject.SafetyNetAlerts.model.JsonFileData;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -16,7 +15,5 @@ public class SafetyNetAlertsApplication {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonFileData jsonFileData = objectMapper.readValue(new File("src/main/resources/json/data.json"), JsonFileData.class);
-		System.out.println(jsonFileData);
 	}
-
 }
