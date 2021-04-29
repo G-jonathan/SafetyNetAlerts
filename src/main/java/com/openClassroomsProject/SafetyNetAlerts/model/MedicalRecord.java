@@ -2,7 +2,7 @@ package com.openClassroomsProject.SafetyNetAlerts.model;
 
 import lombok.Data;
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Entity
@@ -15,7 +15,9 @@ public class MedicalRecord {
     private String firstName;
     @Column(name="last_name")
     private String lastName;
-    private LocalDate birthdate;
-    private String medications;
-    private String allergies;
+    private String birthdate;
+    @ElementCollection
+    private List<String> medications;
+    @ElementCollection
+    private List<String> allergies;
 }
