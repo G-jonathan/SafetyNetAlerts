@@ -2,18 +2,28 @@ package com.openClassroomsProject.SafetyNetAlerts;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openClassroomsProject.SafetyNetAlerts.model.JsonFileData;
+import com.openClassroomsProject.SafetyNetAlerts.service.JsonDataService;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import java.io.File;
-import java.io.IOException;
 
 @SpringBootApplication
 public class SafetyNetAlertsApplication {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		SpringApplication.run(SafetyNetAlertsApplication.class, args);
+	}
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		JsonFileData jsonFileData = objectMapper.readValue(new File("src/main/resources/json/data.json"), JsonFileData.class);
+	@Bean
+	CommandLineRunner runner(JsonDataService jsonDataService) {
+		return args -> {
+			ObjectMapper objectMapper = new ObjectMapper();
+			JsonFileData jsonFileData = objectMapper.readValue(new File("src/main/resources/json/data.json"), JsonFileData.class);
+			jsonDataService.savePersons(jsonFileData.getPersons());
+			jsonDataService.saveFirestations(jsonFileData.getFirestations());
+			jsonDataService.saveMedicalRecords(jsonFileData.getMedicalrecords());
+		};
 	}
 }
