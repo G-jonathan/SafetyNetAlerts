@@ -17,12 +17,12 @@ public class SafetyNetAlertsApplication {
 	}
 
 	@Bean
-	CommandLineRunner runner(JsonDataService jsonDataService) {
+	CommandLineRunner runnerReadJsonWithObjectMapper(JsonDataService jsonDataService) {
 		return args -> {
 			ObjectMapper objectMapper = new ObjectMapper();
 			JsonFileData jsonFileData = objectMapper.readValue(new File("src/main/resources/json/data.json"), JsonFileData.class);
 			jsonDataService.savePersons(jsonFileData.getPersons());
-			jsonDataService.saveFirestations(jsonFileData.getFirestations());
+			jsonDataService.saveFireStations(jsonFileData.getFirestations());
 			jsonDataService.saveMedicalRecords(jsonFileData.getMedicalrecords());
 		};
 	}
