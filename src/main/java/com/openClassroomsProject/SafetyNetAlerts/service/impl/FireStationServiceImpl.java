@@ -2,15 +2,16 @@ package com.openClassroomsProject.SafetyNetAlerts.service.impl;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.FireStation;
 import com.openClassroomsProject.SafetyNetAlerts.repository.FireStationRepository;
-import com.openClassroomsProject.SafetyNetAlerts.service.FireStationService;
+import com.openClassroomsProject.SafetyNetAlerts.service.IFireStationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+@Primary
 @Service
-public class FireStationServiceImpl implements FireStationService {
-
+public class FireStationServiceImpl implements IFireStationService {
     @Autowired
     private FireStationRepository fireStationRepository;
 
@@ -29,19 +30,19 @@ public class FireStationServiceImpl implements FireStationService {
     }
 
     @Override
-    public boolean updateFireStationNumberToAnAddress(String address, String newFireStationNumber) {
+    public Optional<FireStation> updateFireStationNumberOfAnAddress(FireStation fireStation) {
         try {
-            Optional<FireStation> fireStationToUpdate = fireStationRepository.findByAddress(address);
+            Optional<FireStation> fireStationToUpdate = fireStationRepository.findByAddress(fireStation.getAddress());
             if (fireStationToUpdate.isPresent()) {
-                FireStation _fireStationToUpdate = fireStationToUpdate.get();
-                _fireStationToUpdate.setStation(newFireStationNumber);
-                fireStationRepository.save(_fireStationToUpdate);
-                return true;
+                FireStation fireStationUpdated = fireStationToUpdate.get();
+                fireStationUpdated.setStation(fireStation.getStation());
+                fireStationRepository.save(fireStationUpdated);
+                return Optional.of(fireStationUpdated);
             }
         } catch (Exception e) {
             System.out.println("Error attempting to update data in [updateFireStationNumberToAnAddress] method");
         }
-        return false;
+        return Optional.empty();
     }
 
     @Override

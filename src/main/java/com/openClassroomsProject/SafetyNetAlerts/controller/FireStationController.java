@@ -1,20 +1,20 @@
 package com.openClassroomsProject.SafetyNetAlerts.controller;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.FireStation;
-import com.openClassroomsProject.SafetyNetAlerts.service.impl.FireStationServiceImpl;
+import com.openClassroomsProject.SafetyNetAlerts.service.IFireStationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/fireStation")
 public class FireStationController {
-
     @Autowired
-    private FireStationServiceImpl fireStationService;
+    private IFireStationService fireStationService;
 
     @GetMapping
     public Iterable<FireStation> getFireStations() {
@@ -22,29 +22,26 @@ public class FireStationController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addBarracksAndAddressMapping(@RequestBody FireStation firestation) {
-        if (firestation.getAddress().isEmpty() || firestation.getStation().isEmpty()) {
-            return new ResponseEntity<>("A string address and a string station number is required", HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> addStationAndAddressMapping(@Valid @RequestBody FireStation firestation) {
         try {
             fireStationService.addStationAndAddressMapping(firestation);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(firestation + "\n" + " --> has been successfully created", HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{address}")
-    public ResponseEntity<?> updateFireStationNumberToAnAddress(@PathVariable("address") final String address, @RequestBody String newFireStationNumber) {
+    @PutMapping
+    public ResponseEntity<?> updateFireStationNumberOfAnAddress(@Valid @RequestBody FireStation fireStation) {
         try {
-           boolean response = fireStationService.updateFireStationNumberToAnAddress(address, newFireStationNumber);
-           if (response) {
-               return new ResponseEntity<>(HttpStatus.OK);
-           }
+            Optional<FireStation> fireStationUpdated = fireStationService.updateFireStationNumberOfAnAddress(fireStation);
+            if (fireStationUpdated.isPresent()) {
+                return new ResponseEntity<>(fireStationUpdated + "\n" + " --> has been successfully modified", HttpStatus.OK);
+            }
+            return new ResponseEntity<>(fireStationUpdated + "\n" + " --> fireStation not found", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/station/{stationNumber}")
@@ -54,7 +51,7 @@ public class FireStationController {
             if (fireStationsDeleted.isEmpty()) {
                 return new ResponseEntity<>("Station n° " + stationNumber + " not found", HttpStatus.NOT_FOUND);
             }
-            return new ResponseEntity<>(fireStationsDeleted, HttpStatus.OK);
+            return new ResponseEntity<>("stationNumber mapping n° " + stationNumber + "\n" + " ->> has been successfully deleted", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -67,7 +64,7 @@ public class FireStationController {
             if (fireStationDelete.isEmpty()) {
                 return new ResponseEntity<>("Address " + address + " not found", HttpStatus.NOT_FOUND);
             }
-            return new ResponseEntity<>(fireStationDelete, HttpStatus.OK);
+            return new ResponseEntity<>(fireStationDelete + "\n" + " ->> has been successfully deleted", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
