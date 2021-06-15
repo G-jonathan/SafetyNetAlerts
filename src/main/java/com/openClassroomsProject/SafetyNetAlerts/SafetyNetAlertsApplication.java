@@ -25,5 +25,10 @@ public class SafetyNetAlertsApplication {
 			jsonDataService.saveFireStations(jsonFileData.getFirestations());
 			jsonDataService.saveMedicalRecords(jsonFileData.getMedicalrecords());
 		};
+		/* /TODO
+			SafetyNetAlertData data = SafetyNetAlertDataProvider.provideData();
+			SafetyNetAlertInitializer initializer = new SafetynetAlertInitializer(data);
+			initializer.start();
+		*/
 	}
 }
