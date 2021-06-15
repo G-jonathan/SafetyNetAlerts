@@ -1,8 +1,10 @@
 package com.openClassroomsProject.SafetyNetAlerts.service.impl;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.MedicalRecord;
+import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.repository.MedicalRecordRepository;
 import com.openClassroomsProject.SafetyNetAlerts.service.IMedicalRecordService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import java.util.Optional;
 
 @Primary
 @Service
+@Slf4j
 public class MedicalRecordServiceImpl implements IMedicalRecordService {
     @Autowired
     private MedicalRecordRepository medicalRecordRepository;
@@ -52,15 +55,16 @@ public class MedicalRecordServiceImpl implements IMedicalRecordService {
     }
 
     @Override
-    public boolean deleteAMedicalRecord(String firstName, String lastName) {
+    public boolean deleteAMedicalRecord(UniqueIdentifier uniqueIdentifier) {
         try {
-            Optional<MedicalRecord> medicalRecordToDelete = medicalRecordRepository.findMedicalRecordByFirstNameAndLastName(firstName, lastName);
+            Optional<MedicalRecord> medicalRecordToDelete = medicalRecordRepository.findMedicalRecordByFirstNameAndLastName(uniqueIdentifier.getFirstName(), uniqueIdentifier.getLastName());
             if (medicalRecordToDelete.isPresent()) {
                 MedicalRecord medicalRecordDeleted = medicalRecordToDelete.get();
                 medicalRecordRepository.delete(medicalRecordDeleted);
                 return true;
             }
         } catch (Exception e) {
+            log.error(String.valueOf(e));
             System.out.println("Error attempting to delete a person in [MedicalRecordServiceImpl/deleteAMedicalRecord] method");
         }
         return false;

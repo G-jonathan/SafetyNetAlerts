@@ -1,7 +1,10 @@
 package com.openClassroomsProject.SafetyNetAlerts.controller;
 
+import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
+import com.openClassroomsProject.SafetyNetAlerts.exception.ResourceNotFoundException;
 import com.openClassroomsProject.SafetyNetAlerts.model.FireStation;
 import com.openClassroomsProject.SafetyNetAlerts.service.IFireStationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,62 +14,85 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@Slf4j
 @RequestMapping("/fireStation")
 public class FireStationController {
     @Autowired
     private IFireStationService fireStationService;
+    private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.FireStationController";
 
     @GetMapping
     public Iterable<FireStation> getFireStations() {
-        return fireStationService.getFireStations();
+        String functionPath = CLASSPATH + ".getFireStations";
+        log.info("Request received  in " + functionPath);
+        Iterable<FireStation> requestContent;
+        try {
+            requestContent = fireStationService.getFireStations();
+        } catch (Exception exception) {
+            throw new CustomGenericException(functionPath, exception);
+        }
+        log.info("Request success in " + functionPath);
+        return requestContent;
     }
 
     @PostMapping
     public ResponseEntity<?> addStationAndAddressMapping(@Valid @RequestBody FireStation firestation) {
+        String functionPath = CLASSPATH + ".addStationAndAddressMapping";
+        log.info("Request received  in " + functionPath);
         try {
             fireStationService.addStationAndAddressMapping(firestation);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception exception) {
+            throw new CustomGenericException(functionPath, exception);
         }
+        log.info("Request success in " + functionPath);
         return new ResponseEntity<>(firestation + "\n" + " --> has been successfully created", HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<?> updateFireStationNumberOfAnAddress(@Valid @RequestBody FireStation fireStation) {
+        String functionPath = CLASSPATH + ".updateFireStationNumberOfAnAddress";
+        log.info("Request received in " + functionPath);
         try {
             Optional<FireStation> fireStationUpdated = fireStationService.updateFireStationNumberOfAnAddress(fireStation);
             if (fireStationUpdated.isPresent()) {
+                log.info("Request success in: " + functionPath + " FireStation address number successfully modified");
                 return new ResponseEntity<>(fireStationUpdated + "\n" + " --> has been successfully modified", HttpStatus.OK);
             }
-            return new ResponseEntity<>(fireStationUpdated + "\n" + " --> fireStation not found", HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception exception) {
+            throw new CustomGenericException(functionPath, exception);
         }
+        throw new ResourceNotFoundException(functionPath, "FireStation not found");
     }
 
     @DeleteMapping("/station/{stationNumber}")
     public ResponseEntity<?> deleteMappingOfAStation(@PathVariable("stationNumber") final String stationNumber) {
+        String functionPath = CLASSPATH + ".deleteMappingOfAStation";
+        log.info("Request received  in " + functionPath);
         try {
             Optional<List<FireStation>> fireStationsDeleted = fireStationService.deleteMappingOfAStation(stationNumber);
-            if (fireStationsDeleted.isEmpty()) {
-                return new ResponseEntity<>("Station n° " + stationNumber + " not found", HttpStatus.NOT_FOUND);
+            if (fireStationsDeleted.isPresent()) {
+                log.info("Request success in " + functionPath + ". " + fireStationsDeleted + " fireStation deleted: ");
+                return new ResponseEntity<>("stationNumber mapping n° " + stationNumber + "\n" + " ->> has been successfully deleted", HttpStatus.OK);
             }
-            return new ResponseEntity<>("stationNumber mapping n° " + stationNumber + "\n" + " ->> has been successfully deleted", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception exception) {
+            throw new CustomGenericException(functionPath, exception);
         }
+        throw new ResourceNotFoundException(functionPath, "Station number not found");
     }
 
     @DeleteMapping("/address/{address}")
     public ResponseEntity<?> deleteMappingOfAnAddress(@PathVariable("address") final String address) {
+        String functionPath = CLASSPATH + ".deleteMappingOfAnAddress";
+        log.info("Request received  in " + functionPath);
         try {
             Optional<FireStation> fireStationDelete = fireStationService.deleteMappingOfAnAddress(address);
-            if (fireStationDelete.isEmpty()) {
-                return new ResponseEntity<>("Address " + address + " not found", HttpStatus.NOT_FOUND);
+            if (fireStationDelete.isPresent()) {
+                log.info("Request success in " + functionPath + ". " + fireStationDelete + " fireStation deleted: ");
+                return new ResponseEntity<>(fireStationDelete + "\n" + " ->> has been successfully deleted", HttpStatus.OK);
             }
-            return new ResponseEntity<>(fireStationDelete + "\n" + " ->> has been successfully deleted", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception exception) {
+            throw new CustomGenericException(functionPath, exception);
         }
+        throw new ResourceNotFoundException(functionPath, "Address not found");
     }
 }

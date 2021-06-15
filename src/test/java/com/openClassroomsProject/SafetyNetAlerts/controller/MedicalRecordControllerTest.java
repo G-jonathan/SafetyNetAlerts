@@ -1,6 +1,7 @@
 package com.openClassroomsProject.SafetyNetAlerts.controller;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.MedicalRecord;
+import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IMedicalRecordService;
 import com.openClassroomsProject.SafetyNetAlerts.service.JsonDataService;
 import org.junit.jupiter.api.Test;
@@ -71,7 +72,7 @@ class MedicalRecordControllerTest {
 
     @Test
     void testDeleteAMedicalRecordAndResponseIsOk() throws Exception {
-        when(medicalRecordService.deleteAMedicalRecord(any(String.class), any(String.class))).thenReturn(true);
+        when(medicalRecordService.deleteAMedicalRecord(any(UniqueIdentifier.class))).thenReturn(true);
         mockMvc.perform(delete("/medicalRecord")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("firstName", "firstNameTest")
@@ -81,7 +82,7 @@ class MedicalRecordControllerTest {
 
     @Test
     void testDeleteAMedicalRecordAndResponseIsNotFound() throws Exception {
-        when(medicalRecordService.deleteAMedicalRecord(any(String.class), any(String.class))).thenReturn(false);
+        when(medicalRecordService.deleteAMedicalRecord(any(UniqueIdentifier.class))).thenReturn(false);
         mockMvc.perform(delete("/medicalRecord")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("firstName", "firstNameTest")
