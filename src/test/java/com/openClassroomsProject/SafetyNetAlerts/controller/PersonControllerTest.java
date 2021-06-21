@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.openClassroomsProject.SafetyNetAlerts.model.Person;
+import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
 import com.openClassroomsProject.SafetyNetAlerts.service.JsonDataService;
 import org.junit.jupiter.api.Test;
@@ -96,7 +97,7 @@ class PersonControllerTest {
 
     @Test
     void testDeleteAPersonAndResponseIsOk() throws Exception {
-        when(personService.deleteAPerson(any(String.class), any(String.class))).thenReturn(true);
+        when(personService.deleteAPerson(any(UniqueIdentifier.class))).thenReturn(true);
         mockMvc.perform(delete("/person")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("firstName", "firstNameTest")
@@ -106,7 +107,7 @@ class PersonControllerTest {
 
     @Test
     void testDeleteAPersonAndResponseIsNotFound() throws Exception {
-        when(personService.deleteAPerson(any(String.class), any(String.class))).thenReturn(false);
+        when(personService.deleteAPerson(any(UniqueIdentifier.class))).thenReturn(false);
         mockMvc.perform(delete("/person")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("firstName", "firstNameTest")

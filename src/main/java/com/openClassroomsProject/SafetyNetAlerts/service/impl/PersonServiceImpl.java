@@ -1,6 +1,7 @@
 package com.openClassroomsProject.SafetyNetAlerts.service.impl;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.Person;
+import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.repository.PersonRepository;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,9 +55,9 @@ public class PersonServiceImpl implements IPersonService {
     }
 
     @Override
-    public boolean deleteAPerson(String firstName, String lastName) {
+    public boolean deleteAPerson(UniqueIdentifier uniqueIdentifier) {
         try {
-            Optional<Person> personToDelete = personRepository.findPersonByFirstNameAndLastName(firstName, lastName);
+            Optional<Person> personToDelete = personRepository.findPersonByFirstNameAndLastName(uniqueIdentifier.getFirstName(), uniqueIdentifier.getLastName());
             if (personToDelete.isPresent()) {
                 Person personDelete = personToDelete.get();
                 personRepository.delete(personDelete);

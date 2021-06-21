@@ -1,6 +1,7 @@
 package com.openClassroomsProject.SafetyNetAlerts.service;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.Person;
+import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
@@ -13,5 +14,5 @@ public interface IPersonService {
 
     Optional<Person> updateAnExistingPerson(Person person);
 
-    boolean deleteAPerson(String firstName, String lastName);
+    boolean deleteAPerson(UniqueIdentifier uniqueIdentifier);
 }

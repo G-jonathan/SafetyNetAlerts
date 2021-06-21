@@ -1,6 +1,7 @@
 package com.openClassroomsProject.SafetyNetAlerts.service;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.MedicalRecord;
+import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
@@ -13,5 +14,5 @@ public interface IMedicalRecordService {
 
     Optional<MedicalRecord> updateAnExistingMedicalRecord(MedicalRecord medicalRecord);
 
-    boolean deleteAMedicalRecord(String firstName, String lastName);
+    boolean deleteAMedicalRecord(UniqueIdentifier uniqueIdentifier);
 }
