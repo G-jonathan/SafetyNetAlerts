@@ -1,16 +1,20 @@
 package com.openClassroomsProject.SafetyNetAlerts.service.impl;
 
+import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
 import com.openClassroomsProject.SafetyNetAlerts.model.Person;
 import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.repository.PersonRepository;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Primary
 @Service
+@Slf4j
 public class PersonServiceImpl implements IPersonService {
     @Autowired
     private PersonRepository personRepository;
@@ -67,5 +71,19 @@ public class PersonServiceImpl implements IPersonService {
             System.out.println("Error attempting to delete a person in [PersonServiceImpl/deleteAPerson] method");
         }
         return false;
+    }
+
+    @Override
+    public ArrayList<String> getEmailsOfCityDwellers(String city) throws CustomGenericException {
+        log.debug("Entered into PersonServiceImpl.getEmailsOfCityDwellers method");
+        ArrayList<Person> personsWhoLiveInThisCity = personRepository.findPersonByCity(city);
+        ArrayList<String> emailListOfPersonsWhoLiveInThisCity = new ArrayList<>();
+        if (personsWhoLiveInThisCity.isEmpty()) {
+            return emailListOfPersonsWhoLiveInThisCity;
+        }
+        for (Person person : personsWhoLiveInThisCity) {
+            emailListOfPersonsWhoLiveInThisCity.add(person.getEmail());
+        }
+        return emailListOfPersonsWhoLiveInThisCity;
     }
 }

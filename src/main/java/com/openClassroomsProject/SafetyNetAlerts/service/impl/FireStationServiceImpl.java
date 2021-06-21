@@ -48,6 +48,7 @@ public class FireStationServiceImpl implements IFireStationService {
     @Override
     public Optional<List<FireStation>> deleteMappingOfAStation(String stationNumber) {
         Optional<List<FireStation>> fireStationsToDelete = fireStationRepository.findByStation(stationNumber);
+        //TODO condition always true
         if (fireStationsToDelete.isPresent()) {
             try {
                 List<FireStation> _fireStationsToDelete = fireStationsToDelete.get();
