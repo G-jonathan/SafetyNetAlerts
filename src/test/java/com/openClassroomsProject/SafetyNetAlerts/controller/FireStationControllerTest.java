@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 @RunWith(SpringRunner.class)
@@ -27,6 +28,25 @@ public class FireStationControllerTest {
     private JsonDataService jsonDataService;
     @MockBean
     private IFireStationService fireStationService;
+
+    @Test
+    public void testGetPhoneNumbersPersonServedByAFireStationAndResponseIsOk() throws Exception {
+        ArrayList<String> requestContent = new ArrayList<>(Arrays.asList("000-000-000", "999-999-999"));
+        when(fireStationService.getPhoneNumbersPersonServedByAFireStation(any(String.class))).thenReturn(requestContent);
+        mockMvc.perform(get("/phoneAlert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("fireStation", "0"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetPhoneNumbersPersonServedByAFireStationAndResponseIsNotFound() throws Exception {
+        when(fireStationService.getPhoneNumbersPersonServedByAFireStation(any(String.class))).thenReturn(new ArrayList<>());
+        mockMvc.perform(get("/phoneAlert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("fireStation", "0"))
+                .andExpect(status().isNotFound());
+    }
 
     @Test
     public void testGetFireStationsAndResponseIsOk() throws Exception {

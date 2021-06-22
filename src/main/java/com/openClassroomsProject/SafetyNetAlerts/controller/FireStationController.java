@@ -10,18 +10,35 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @Slf4j
-@RequestMapping("/fireStation")
 public class FireStationController {
     @Autowired
     private IFireStationService fireStationService;
     private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.FireStationController";
 
-    @GetMapping
+    @GetMapping("/phoneAlert")
+    public ResponseEntity<ArrayList<String>> getPhoneNumbersPersonServedByAFireStation(@RequestParam String fireStation) {
+        String functionPath = CLASSPATH + ".getPhoneNumbersPersonServedByAFireStation";
+        log.info("Request received  in " + functionPath);
+        ArrayList<String> requestContent;
+        try {
+            requestContent = fireStationService.getPhoneNumbersPersonServedByAFireStation(fireStation);
+        } catch (Exception exception) {
+            throw new CustomGenericException(functionPath, exception);
+        }
+        if (requestContent.isEmpty()) {
+            throw new ResourceNotFoundException(functionPath, "Nothing found for this fireStation");
+        }
+        log.info("Request success in " + functionPath);
+        return new ResponseEntity<>(requestContent, HttpStatus.OK);
+    }
+
+    @GetMapping("/fireStation")
     public Iterable<FireStation> getFireStations() {
         String functionPath = CLASSPATH + ".getFireStations";
         log.info("Request received  in " + functionPath);
@@ -35,7 +52,7 @@ public class FireStationController {
         return requestContent;
     }
 
-    @PostMapping
+    @PostMapping("/fireStation")
     public ResponseEntity<?> addStationAndAddressMapping(@Valid @RequestBody FireStation firestation) {
         String functionPath = CLASSPATH + ".addStationAndAddressMapping";
         log.info("Request received  in " + functionPath);
@@ -48,7 +65,7 @@ public class FireStationController {
         return new ResponseEntity<>(firestation + "\n" + " --> has been successfully created", HttpStatus.CREATED);
     }
 
-    @PutMapping
+    @PutMapping("/fireStation")
     public ResponseEntity<?> updateFireStationNumberOfAnAddress(@Valid @RequestBody FireStation fireStation) {
         String functionPath = CLASSPATH + ".updateFireStationNumberOfAnAddress";
         log.info("Request received in " + functionPath);
@@ -64,7 +81,7 @@ public class FireStationController {
         throw new ResourceNotFoundException(functionPath, "FireStation not found");
     }
 
-    @DeleteMapping("/station/{stationNumber}")
+    @DeleteMapping("/fireStation/station/{stationNumber}")
     public ResponseEntity<?> deleteMappingOfAStation(@PathVariable("stationNumber") final String stationNumber) {
         String functionPath = CLASSPATH + ".deleteMappingOfAStation";
         log.info("Request received  in " + functionPath);
@@ -80,7 +97,7 @@ public class FireStationController {
         throw new ResourceNotFoundException(functionPath, "Station number not found");
     }
 
-    @DeleteMapping("/address/{address}")
+    @DeleteMapping("/fireStation/address/{address}")
     public ResponseEntity<?> deleteMappingOfAnAddress(@PathVariable("address") final String address) {
         String functionPath = CLASSPATH + ".deleteMappingOfAnAddress";
         log.info("Request received  in " + functionPath);

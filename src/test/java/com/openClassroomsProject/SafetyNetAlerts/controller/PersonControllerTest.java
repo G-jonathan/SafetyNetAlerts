@@ -16,7 +16,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -34,7 +33,7 @@ class PersonControllerTest {
     @Test
     void testGetEmailsOfCityDwellersAndResponseIsOk() throws Exception {
         ArrayList<String> requestContent = new ArrayList<String>(Arrays.asList("emailTest@test.fr","emailTest2@test.fr"));
-        when(personService.getEmailsOfCityDwellers(any(String.class))).thenReturn(Optional.of(requestContent));
+        when(personService.getEmailsOfCityDwellers(any(String.class))).thenReturn(requestContent);
         mockMvc.perform(get("/communityEmail")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("city", "cityTest"))
@@ -43,7 +42,8 @@ class PersonControllerTest {
 
     @Test
     void testGetEmailsOfCityDwellersAndResponseIsNotFound() throws Exception {
-        when(personService.getEmailsOfCityDwellers(any(String.class))).thenReturn(Optional.empty());
+        ArrayList<String> requestContent = new ArrayList<>();
+        when(personService.getEmailsOfCityDwellers(any(String.class))).thenReturn(requestContent);
         mockMvc.perform(get("/communityEmail")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("city", "cityTest"))
