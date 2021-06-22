@@ -11,20 +11,37 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
 @Slf4j
-@RequestMapping("/person")
 public class PersonController {
     @Autowired
     private IPersonService personService;
     private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.PersonController";
 
-    @GetMapping
+    @GetMapping("/communityEmail")
+    public ResponseEntity<ArrayList<String>> getEmailsOfCityDwellers(@RequestParam String city) {
+        String functionPath = CLASSPATH + ".getEmailsFromCityDwellers";
+        log.info("Request received in " + functionPath);
+        ArrayList<String> requestContent;
+        try {
+            requestContent = personService.getEmailsOfCityDwellers(city);
+        } catch (Exception exception) {
+            throw new CustomGenericException(functionPath, exception);
+        }
+        if (requestContent.isEmpty()) {
+            throw new ResourceNotFoundException(functionPath, "Nothing found for this city");
+        }
+        log.info("Request success in " + functionPath);
+        return new ResponseEntity<>(requestContent, HttpStatus.OK);
+    }
+
+    @GetMapping("/person")
     public Iterable<Person> getPersons() {
         String functionPath = CLASSPATH + ".getPersons";
-        log.info("Request received  in " + functionPath);
+        log.info("Request received in " + functionPath);
         Iterable<Person> requestContent;
         try {
             requestContent = personService.getPersons();
@@ -35,10 +52,10 @@ public class PersonController {
         return requestContent;
     }
 
-    @PostMapping
+    @PostMapping("/person")
     public ResponseEntity<?> addNewPerson(@Valid @RequestBody Person person) {
         String functionPath = CLASSPATH + ".addNewPerson";
-        log.info("Request received  in " + functionPath);
+        log.info("Request received in " + functionPath);
         try {
             personService.addNewPerson(person);
         } catch (Exception exception) {
@@ -48,7 +65,7 @@ public class PersonController {
         return new ResponseEntity<>(person + "\n" + " --> has been successfully created", HttpStatus.CREATED);
     }
 
-    @PutMapping
+    @PutMapping("/person")
     public ResponseEntity<?> updateAnExistingPerson(@Valid @RequestBody Person person) {
         String functionPath = CLASSPATH + ".updateAnExistingPerson";
         log.info("Request received in " + functionPath);
@@ -64,10 +81,10 @@ public class PersonController {
         throw new ResourceNotFoundException(functionPath, "Person not found");
     }
 
-    @DeleteMapping
+    @DeleteMapping("/person")
     public ResponseEntity<?> deleteAPerson(@Valid @RequestBody UniqueIdentifier uniqueIdentifier) {
         String functionPath = CLASSPATH + ".deleteAPerson";
-        log.info("Request received  in " + functionPath);
+        log.info("Request received in " + functionPath);
         try {
             boolean isSuccess = personService.deleteAPerson(uniqueIdentifier);
             if (isSuccess) {
