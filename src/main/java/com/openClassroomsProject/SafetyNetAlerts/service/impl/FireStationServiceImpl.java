@@ -1,19 +1,27 @@
 package com.openClassroomsProject.SafetyNetAlerts.service.impl;
 
+import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
 import com.openClassroomsProject.SafetyNetAlerts.model.FireStation;
+import com.openClassroomsProject.SafetyNetAlerts.model.Person;
 import com.openClassroomsProject.SafetyNetAlerts.repository.FireStationRepository;
+import com.openClassroomsProject.SafetyNetAlerts.repository.PersonRepository;
 import com.openClassroomsProject.SafetyNetAlerts.service.IFireStationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Primary
 @Service
+@Slf4j
 public class FireStationServiceImpl implements IFireStationService {
     @Autowired
     private FireStationRepository fireStationRepository;
+    @Autowired
+    private PersonRepository personRepository;
 
     @Override
     public Iterable<FireStation> getFireStations() {
@@ -74,5 +82,22 @@ public class FireStationServiceImpl implements IFireStationService {
             }
         }
         return fireStationToDelete;
+    }
+
+    @Override
+    public ArrayList<String> getPhoneNumbersPersonServedByAFireStation(String fireStationNumber) throws CustomGenericException {
+        log.debug("Entered into FireStationServiceImpl.getPhoneNumbersPersonServedByAFireStation method");
+        ArrayList<FireStation> fireStationDeserveByThisStation = fireStationRepository.findFireStationByStation(fireStationNumber);
+        ArrayList<String> phoneNumbersPersonServedByAFireStation = new ArrayList<>();
+        if (fireStationDeserveByThisStation.isEmpty()) {
+            return phoneNumbersPersonServedByAFireStation;
+        }
+        for (FireStation fireStation : fireStationDeserveByThisStation) {
+            ArrayList<Person> personWhoLiveAtThisAddress = personRepository.findPersonByAddress(fireStation.getAddress());
+            for (Person person : personWhoLiveAtThisAddress) {
+                phoneNumbersPersonServedByAFireStation.add(person.getPhone());
+            }
+        }
+        return phoneNumbersPersonServedByAFireStation;
     }
 }

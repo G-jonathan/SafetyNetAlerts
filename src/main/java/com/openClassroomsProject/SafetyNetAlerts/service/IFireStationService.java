@@ -2,6 +2,7 @@ package com.openClassroomsProject.SafetyNetAlerts.service;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.FireStation;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,4 +18,6 @@ public interface IFireStationService {
      Optional<List<FireStation>> deleteMappingOfAStation(String stationId);
 
      Optional<FireStation> deleteMappingOfAnAddress(String address);
+
+     ArrayList<String> getPhoneNumbersPersonServedByAFireStation(String fireStationNumber);
 }

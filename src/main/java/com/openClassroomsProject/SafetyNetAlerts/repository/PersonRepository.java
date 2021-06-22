@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Repository
-public interface PersonRepository extends CrudRepository<Person,Long> {
+public interface PersonRepository extends CrudRepository<Person, Long> {
 
     Optional<Person> findPersonByFirstNameAndLastName(String firstName, String lastName);
 
     ArrayList<Person> findPersonByCity(String city);
+
+    ArrayList<Person> findPersonByAddress(String address);
 }
