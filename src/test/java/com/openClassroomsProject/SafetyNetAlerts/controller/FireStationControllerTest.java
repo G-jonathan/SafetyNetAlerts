@@ -5,6 +5,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.openClassroomsProject.SafetyNetAlerts.model.FireStation;
+import com.openClassroomsProject.SafetyNetAlerts.model.PersonCoveredByAFireStation;
+import com.openClassroomsProject.SafetyNetAlerts.model.PersonListCoveredByAFireStation;
 import com.openClassroomsProject.SafetyNetAlerts.service.IFireStationService;
 import com.openClassroomsProject.SafetyNetAlerts.service.JsonDataService;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Optional;
 
 @RunWith(SpringRunner.class)
@@ -30,9 +33,31 @@ public class FireStationControllerTest {
     private IFireStationService fireStationService;
 
     @Test
+    public void testGetPersonListCoveredByAFireStationAndResponseIsOk() throws Exception {
+        ArrayList<PersonCoveredByAFireStation> testList = new ArrayList<>();
+        HashMap<String, String> testMap = new HashMap<>();
+        PersonListCoveredByAFireStation testObject = new PersonListCoveredByAFireStation(testList, testMap);
+
+        when(fireStationService.getPersonListCoveredByAFireStation(any(String.class))).thenReturn(Optional.of(testObject));
+        mockMvc.perform(get("/firestation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("fireStation", "0"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetPersonListCoveredByAFireStationAndResponseIsNotFound() throws Exception {
+        when(fireStationService.getPersonListCoveredByAFireStation(any(String.class))).thenReturn(Optional.empty());
+        mockMvc.perform(get("/firestation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("fireStation", "0"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testGetPhoneNumbersPersonServedByAFireStationAndResponseIsOk() throws Exception {
-        ArrayList<String> requestContent = new ArrayList<>(Arrays.asList("000-000-000", "999-999-999"));
-        when(fireStationService.getPhoneNumbersPersonServedByAFireStation(any(String.class))).thenReturn(requestContent);
+        ArrayList<String> testList = new ArrayList<>(Arrays.asList("000-000-000", "999-999-999"));
+        when(fireStationService.getPhoneNumbersPersonServedByAFireStation(any(String.class))).thenReturn(testList);
         mockMvc.perform(get("/phoneAlert")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("fireStation", "0"))
