@@ -1,7 +1,7 @@
 package com.openClassroomsProject.SafetyNetAlerts.service;
 
 import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
-import com.openClassroomsProject.SafetyNetAlerts.model.Person;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;

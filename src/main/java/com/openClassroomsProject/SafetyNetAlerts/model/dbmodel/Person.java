@@ -1,4 +1,4 @@
-package com.openClassroomsProject.SafetyNetAlerts.model;
+package com.openClassroomsProject.SafetyNetAlerts.model.dbmodel;
 
 import lombok.Data;
 import javax.persistence.*;

@@ -1,6 +1,6 @@
 package com.openClassroomsProject.SafetyNetAlerts.controller;
 
-import com.openClassroomsProject.SafetyNetAlerts.model.MedicalRecord;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
 import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IMedicalRecordService;
 import com.openClassroomsProject.SafetyNetAlerts.service.JsonDataService;

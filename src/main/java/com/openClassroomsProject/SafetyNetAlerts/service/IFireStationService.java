@@ -1,6 +1,7 @@
 package com.openClassroomsProject.SafetyNetAlerts.service;
 
-import com.openClassroomsProject.SafetyNetAlerts.model.FireStation;
+import com.openClassroomsProject.SafetyNetAlerts.model.PersonAndFireStationNumberWhoServedHim;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.FireStation;
 import com.openClassroomsProject.SafetyNetAlerts.model.PersonListCoveredByAFireStation;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -23,4 +24,6 @@ public interface IFireStationService {
      ArrayList<String> getPhoneNumbersPersonServedByAFireStation(String fireStationNumber);
 
      Optional<PersonListCoveredByAFireStation> getPersonListCoveredByAFireStation(String fireStationNumber);
+
+     ArrayList<PersonAndFireStationNumberWhoServedHim> getPersonListAndHerFireStationNumber(String Address);
 }

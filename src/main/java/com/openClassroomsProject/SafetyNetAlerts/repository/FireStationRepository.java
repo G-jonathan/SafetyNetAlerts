@@ -1,6 +1,6 @@
 package com.openClassroomsProject.SafetyNetAlerts.repository;
 
-import com.openClassroomsProject.SafetyNetAlerts.model.FireStation;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.FireStation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.ArrayList;

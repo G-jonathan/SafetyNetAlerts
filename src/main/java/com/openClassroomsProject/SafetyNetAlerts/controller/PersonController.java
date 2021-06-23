@@ -2,7 +2,7 @@ package com.openClassroomsProject.SafetyNetAlerts.controller;
 
 import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
 import com.openClassroomsProject.SafetyNetAlerts.exception.ResourceNotFoundException;
-import com.openClassroomsProject.SafetyNetAlerts.model.Person;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +20,8 @@ public class PersonController {
     @Autowired
     private IPersonService personService;
     private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.PersonController";
+
+
 
     @GetMapping("/communityEmail")
     public ResponseEntity<ArrayList<String>> getEmailsOfCityDwellers(@RequestParam String city) {

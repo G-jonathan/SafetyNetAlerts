@@ -2,17 +2,18 @@ package com.openClassroomsProject.SafetyNetAlerts.service.impl;
 
 import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
 import com.openClassroomsProject.SafetyNetAlerts.model.*;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.FireStation;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import com.openClassroomsProject.SafetyNetAlerts.repository.FireStationRepository;
 import com.openClassroomsProject.SafetyNetAlerts.repository.MedicalRecordRepository;
 import com.openClassroomsProject.SafetyNetAlerts.repository.PersonRepository;
 import com.openClassroomsProject.SafetyNetAlerts.service.IFireStationService;
+import com.openClassroomsProject.SafetyNetAlerts.service.helper.AgeCalculator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -131,25 +132,24 @@ public class FireStationServiceImpl implements IFireStationService {
             UniqueIdentifier uniqueIdentifier =new UniqueIdentifier(person.getFirstName(), person.getLastName());
             uniqueIdentifierArrayList.add(uniqueIdentifier);
         }
-        HashMap<String, String> numberOfAdultAndChildrenHashMap = calculate(uniqueIdentifierArrayList);
+        HashMap<String, String> numberOfAdultAndChildrenHashMap = calculationOfTheNumberOfAdultsAndChildren(uniqueIdentifierArrayList);
         PersonListCoveredByAFireStation personListCoveredByAFireStation = new PersonListCoveredByAFireStation(personListCoveredByThisFireStation, numberOfAdultAndChildrenHashMap);
         return Optional.of(personListCoveredByAFireStation);
     }
 
-    public HashMap<String, String> calculate (ArrayList<UniqueIdentifier> uniqueIdentifierArrayList) {
+    public HashMap<String, String> calculationOfTheNumberOfAdultsAndChildren (ArrayList<UniqueIdentifier> uniqueIdentifierArrayList) {
         log.debug("Entered into CalculationOfTheNumberOfAdultsAndChildren.calculate method");
         int adults = 0;
         int children = 0;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        LocalDate now = LocalDate.now();
         HashMap<String, String> numberOfAdultAndChildrenHashMap = new HashMap<>();
+        numberOfAdultAndChildrenHashMap.put("Adults", "null");
+        numberOfAdultAndChildrenHashMap.put("Children", "null");
         for (UniqueIdentifier uniqueIdentifier : uniqueIdentifierArrayList) {
             Optional<MedicalRecord> medicalRecord = medicalRecordRepository.findMedicalRecordByFirstNameAndLastName(uniqueIdentifier.getFirstName(), uniqueIdentifier.getLastName());
             if (medicalRecord.isPresent()) {
-                String birthdate = medicalRecord.get().getBirthdate();
-                LocalDate birthDateConverted = LocalDate.parse(birthdate, formatter);
-                long duration = ChronoUnit.DAYS.between(birthDateConverted, now);
-                int age = (int) (duration/365);
+                String birthDate = medicalRecord.get().getBirthdate();
+                AgeCalculationModel ageCalculationModel = new AgeCalculationModel(birthDate, "MM/dd/yyyy");
+                int age = AgeCalculator.ageCalculator(ageCalculationModel);
                 if (age > 19) {
                     adults++;
                 } else {
@@ -160,5 +160,28 @@ public class FireStationServiceImpl implements IFireStationService {
         numberOfAdultAndChildrenHashMap.put("Adults", String.valueOf(adults));
         numberOfAdultAndChildrenHashMap.put("Children", String.valueOf(children));
         return numberOfAdultAndChildrenHashMap;
+    }
+
+    public ArrayList<PersonAndFireStationNumberWhoServedHim> getPersonListAndHerFireStationNumber(String address) {
+        log.debug("Entered into getPersonListAndHerFireStationNumber.calculate method");
+        ArrayList<Person> personWhoLiveAtThisAddress = personRepository.findPersonByAddress(address);
+        ArrayList<PersonAndFireStationNumberWhoServedHim> personAndFireStationNumberWhoServedHimArrayList = new ArrayList<>();
+        for (Person person : personWhoLiveAtThisAddress) {
+            Optional<FireStation> fireStation = fireStationRepository.findByAddress(person.getAddress());
+            String fireStationAddress = fireStation.get().getStation();
+            Optional<MedicalRecord> medicalRecord = medicalRecordRepository.findMedicalRecordByFirstNameAndLastName(person.getFirstName(), person.getLastName());
+            AgeCalculationModel ageCalculationModel = new AgeCalculationModel(medicalRecord.get().getBirthdate(), "MM/dd/yyyy");
+            String age = String.valueOf(AgeCalculator.ageCalculator(ageCalculationModel));
+            PersonAndFireStationNumberWhoServedHim personAndFireStationNumberWhoServedHim = new PersonAndFireStationNumberWhoServedHim();
+            personAndFireStationNumberWhoServedHim.setFirstName(person.getFirstName());
+            personAndFireStationNumberWhoServedHim.setLastName(person.getLastName());
+            personAndFireStationNumberWhoServedHim.setPhoneNumber(person.getPhone());
+            personAndFireStationNumberWhoServedHim.setAge(age);
+            personAndFireStationNumberWhoServedHim.setMedication(medicalRecord.get().getMedications());
+            personAndFireStationNumberWhoServedHim.setAllergies(medicalRecord.get().getAllergies());
+            personAndFireStationNumberWhoServedHim.setFireStationNumber(fireStationAddress);
+            personAndFireStationNumberWhoServedHimArrayList.add(personAndFireStationNumberWhoServedHim);
+        }
+        return personAndFireStationNumberWhoServedHimArrayList;
     }
 }

@@ -1,6 +1,6 @@
 package com.openClassroomsProject.SafetyNetAlerts.repository;
 
-import com.openClassroomsProject.SafetyNetAlerts.model.MedicalRecord;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
