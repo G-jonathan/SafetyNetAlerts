@@ -3,6 +3,7 @@ package com.openClassroomsProject.SafetyNetAlerts.controller;
 import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
 import com.openClassroomsProject.SafetyNetAlerts.exception.ResourceNotFoundException;
 import com.openClassroomsProject.SafetyNetAlerts.model.FireStation;
+import com.openClassroomsProject.SafetyNetAlerts.model.PersonListCoveredByAFireStation;
 import com.openClassroomsProject.SafetyNetAlerts.service.IFireStationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,23 @@ public class FireStationController {
     @Autowired
     private IFireStationService fireStationService;
     private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.FireStationController";
+
+    @GetMapping("/firestation")
+    public ResponseEntity<Optional<PersonListCoveredByAFireStation>> getPersonListCoveredByAFireStation(@RequestParam String fireStation) {
+        String functionPath = CLASSPATH + ".getPersonListCoveredByAFireStation";
+        log.info("Request received  in " + functionPath);
+        Optional<PersonListCoveredByAFireStation> requestContent;
+        try {
+            requestContent = fireStationService.getPersonListCoveredByAFireStation(fireStation);
+        } catch (Exception exception) {
+            throw new CustomGenericException(functionPath, exception);
+        }
+        if (requestContent.isEmpty()) {
+            throw new ResourceNotFoundException(functionPath, "Nothing found for this fireStation");
+        }
+        log.info("Request success in " + functionPath);
+        return new ResponseEntity<>(requestContent, HttpStatus.OK);
+    }
 
     @GetMapping("/phoneAlert")
     public ResponseEntity<ArrayList<String>> getPhoneNumbersPersonServedByAFireStation(@RequestParam String fireStation) {
