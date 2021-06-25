@@ -1,7 +1,7 @@
 package com.openClassroomsProject.SafetyNetAlerts.service.impl;
 
 import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
-import com.openClassroomsProject.SafetyNetAlerts.model.Person;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.repository.PersonRepository;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;

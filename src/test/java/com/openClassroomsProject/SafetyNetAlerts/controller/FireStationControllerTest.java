@@ -4,7 +4,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import com.openClassroomsProject.SafetyNetAlerts.model.FireStation;
+
+import com.openClassroomsProject.SafetyNetAlerts.model.PersonAndFireStationNumberWhoServedHim;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.FireStation;
 import com.openClassroomsProject.SafetyNetAlerts.model.PersonCoveredByAFireStation;
 import com.openClassroomsProject.SafetyNetAlerts.model.PersonListCoveredByAFireStation;
 import com.openClassroomsProject.SafetyNetAlerts.service.IFireStationService;
@@ -31,6 +33,27 @@ public class FireStationControllerTest {
     private JsonDataService jsonDataService;
     @MockBean
     private IFireStationService fireStationService;
+
+    @Test
+    public void testGetPersonListAndHerFireStationNumberAndResponseIsOk() throws Exception {
+        PersonAndFireStationNumberWhoServedHim personAndFireStationNumberWhoServedHim = new PersonAndFireStationNumberWhoServedHim();
+        ArrayList<PersonAndFireStationNumberWhoServedHim> personAndFireStationNumberWhoServedHimArrayListTest = new ArrayList<>();
+        personAndFireStationNumberWhoServedHimArrayListTest.add(personAndFireStationNumberWhoServedHim);
+        when(fireStationService.getPersonListAndHerFireStationNumber(any(String.class))).thenReturn(personAndFireStationNumberWhoServedHimArrayListTest);
+        mockMvc.perform(get("/fire")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("address", "addressTest"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetPersonListAndHerFireStationNumberAndResponseIsNotFound() throws Exception {
+        when(fireStationService.getPersonListAndHerFireStationNumber(any(String.class))).thenReturn(new ArrayList<>());
+        mockMvc.perform(get("/fire")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("address", "addressTest"))
+                .andExpect(status().isNotFound());
+    }
 
     @Test
     public void testGetPersonListCoveredByAFireStationAndResponseIsOk() throws Exception {

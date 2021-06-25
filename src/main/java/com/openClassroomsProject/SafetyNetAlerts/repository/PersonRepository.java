@@ -1,6 +1,6 @@
 package com.openClassroomsProject.SafetyNetAlerts.repository;
 
-import com.openClassroomsProject.SafetyNetAlerts.model.Person;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import java.util.ArrayList;

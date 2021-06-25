@@ -1,8 +1,8 @@
 package com.openClassroomsProject.SafetyNetAlerts.service;
 
-import com.openClassroomsProject.SafetyNetAlerts.model.FireStation;
-import com.openClassroomsProject.SafetyNetAlerts.model.MedicalRecord;
-import com.openClassroomsProject.SafetyNetAlerts.model.Person;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.FireStation;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import com.openClassroomsProject.SafetyNetAlerts.repository.FireStationRepository;
 import com.openClassroomsProject.SafetyNetAlerts.repository.MedicalRecordRepository;
 import com.openClassroomsProject.SafetyNetAlerts.repository.PersonRepository;

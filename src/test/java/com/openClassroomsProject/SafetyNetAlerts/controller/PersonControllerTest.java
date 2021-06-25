@@ -4,7 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import com.openClassroomsProject.SafetyNetAlerts.model.Person;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
 import com.openClassroomsProject.SafetyNetAlerts.service.JsonDataService;

@@ -2,7 +2,7 @@ package com.openClassroomsProject.SafetyNetAlerts.controller;
 
 import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
 import com.openClassroomsProject.SafetyNetAlerts.exception.ResourceNotFoundException;
-import com.openClassroomsProject.SafetyNetAlerts.model.MedicalRecord;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
 import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IMedicalRecordService;
 import lombok.extern.slf4j.Slf4j;
