@@ -1,6 +1,6 @@
 package com.openClassroomsProject.SafetyNetAlerts.exception;
 
-public class ResourceNotFoundException extends RuntimeException{
+public class ResourceNotFoundException extends RuntimeException {
     private final String location;
     private final String message;
 

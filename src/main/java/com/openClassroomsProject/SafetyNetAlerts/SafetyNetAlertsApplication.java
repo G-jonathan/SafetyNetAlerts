@@ -1,13 +1,12 @@
 package com.openClassroomsProject.SafetyNetAlerts;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.openClassroomsProject.SafetyNetAlerts.model.JsonFileData;
-import com.openClassroomsProject.SafetyNetAlerts.service.JsonDataService;
+import com.openClassroomsProject.SafetyNetAlerts.model.SafetyNetAlertData;
+import com.openClassroomsProject.SafetyNetAlerts.service.starter.JsonDataService;
+import com.openClassroomsProject.SafetyNetAlerts.service.starter.SafetyNetAlertInitializer;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import java.io.File;
 
 @SpringBootApplication
 public class SafetyNetAlertsApplication {
@@ -19,16 +18,9 @@ public class SafetyNetAlertsApplication {
 	@Bean
 	CommandLineRunner runnerReadJsonWithObjectMapper(JsonDataService jsonDataService) {
 		return args -> {
-			ObjectMapper objectMapper = new ObjectMapper();
-			JsonFileData jsonFileData = objectMapper.readValue(new File("src/main/resources/json/data.json"), JsonFileData.class);
-			jsonDataService.savePersons(jsonFileData.getPersons());
-			jsonDataService.saveFireStations(jsonFileData.getFirestations());
-			jsonDataService.saveMedicalRecords(jsonFileData.getMedicalrecords());
-		};
-		/* /TODO
-			SafetyNetAlertData data = SafetyNetAlertDataProvider.provideData();
-			SafetyNetAlertInitializer initializer = new SafetynetAlertInitializer(data);
+			String dataFilePath = new SafetyNetAlertData().getFILEPATH();
+			SafetyNetAlertInitializer initializer = new SafetyNetAlertInitializer(jsonDataService, dataFilePath);
 			initializer.start();
-		*/
+		};
 	}
 }

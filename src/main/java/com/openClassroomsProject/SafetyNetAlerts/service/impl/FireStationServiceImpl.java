@@ -5,6 +5,7 @@ import com.openClassroomsProject.SafetyNetAlerts.model.*;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.FireStation;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.*;
 import com.openClassroomsProject.SafetyNetAlerts.repository.FireStationRepository;
 import com.openClassroomsProject.SafetyNetAlerts.repository.MedicalRecordRepository;
 import com.openClassroomsProject.SafetyNetAlerts.repository.PersonRepository;
@@ -129,7 +130,7 @@ public class FireStationServiceImpl implements IFireStationService {
         }
         ArrayList<UniqueIdentifier> uniqueIdentifierArrayList = new ArrayList<>();
         for (PersonCoveredByAFireStation person : personListCoveredByThisFireStation) {
-            UniqueIdentifier uniqueIdentifier =new UniqueIdentifier(person.getFirstName(), person.getLastName());
+            UniqueIdentifier uniqueIdentifier = new UniqueIdentifier(person.getFirstName(), person.getLastName());
             uniqueIdentifierArrayList.add(uniqueIdentifier);
         }
         HashMap<String, String> numberOfAdultAndChildrenHashMap = calculationOfTheNumberOfAdultsAndChildren(uniqueIdentifierArrayList);
@@ -137,8 +138,8 @@ public class FireStationServiceImpl implements IFireStationService {
         return Optional.of(personListCoveredByAFireStation);
     }
 
-    public HashMap<String, String> calculationOfTheNumberOfAdultsAndChildren (ArrayList<UniqueIdentifier> uniqueIdentifierArrayList) {
-        log.debug("Entered into CalculationOfTheNumberOfAdultsAndChildren.calculate method");
+    public HashMap<String, String> calculationOfTheNumberOfAdultsAndChildren(ArrayList<UniqueIdentifier> uniqueIdentifierArrayList) {
+        log.debug("Entered into FireStationServiceImpl.calculationOfTheNumberOfAdultsAndChildren method");
         int adults = 0;
         int children = 0;
         HashMap<String, String> numberOfAdultAndChildrenHashMap = new HashMap<>();
@@ -162,8 +163,9 @@ public class FireStationServiceImpl implements IFireStationService {
         return numberOfAdultAndChildrenHashMap;
     }
 
+    @Override
     public ArrayList<PersonAndFireStationNumberWhoServedHim> getPersonListAndHerFireStationNumber(String address) {
-        log.debug("Entered into getPersonListAndHerFireStationNumber.calculate method");
+        log.debug("Entered into FireStationServiceImpl.getPersonListAndHerFireStationNumber method");
         ArrayList<Person> personWhoLiveAtThisAddress = personRepository.findPersonByAddress(address);
         ArrayList<PersonAndFireStationNumberWhoServedHim> personAndFireStationNumberWhoServedHimArrayList = new ArrayList<>();
         for (Person person : personWhoLiveAtThisAddress) {
@@ -183,5 +185,40 @@ public class FireStationServiceImpl implements IFireStationService {
             personAndFireStationNumberWhoServedHimArrayList.add(personAndFireStationNumberWhoServedHim);
         }
         return personAndFireStationNumberWhoServedHimArrayList;
+    }
+
+    @Override
+    public ArrayList<HouseHold> getListOfHomesServedByThisStations(ArrayList<String> stationsNumbers) {
+        log.debug("Entered into FireStationServiceImpl.getListOfHomesServedByThisStations method");
+        ArrayList<HouseHold> houseHoldArrayList = new ArrayList<>();
+        for (String station : stationsNumbers) {
+            ArrayList<FireStation> fireStationWhoContainsThisFireStationNumber = fireStationRepository.findFireStationByStation(station);
+            for (FireStation fireStation : fireStationWhoContainsThisFireStationNumber) {
+                ArrayList<Person> personWhoLiveAtThisAddress = personRepository.findPersonByAddress(fireStation.getAddress());
+                ArrayList<HouseHoldMember> houseHoldMemberArrayList = buildHouseHoldMemberArrayList(personWhoLiveAtThisAddress);
+                HouseHold houseHold = new HouseHold(fireStation.getAddress(), houseHoldMemberArrayList);
+                houseHoldArrayList.add(houseHold);
+            }
+        }
+        return houseHoldArrayList;
+    }
+
+    public ArrayList<HouseHoldMember> buildHouseHoldMemberArrayList(ArrayList<Person> personWhoLiveAtTheSameAddress) {
+        log.debug("Entered into FireStationServiceImpl.buildHouseHoldMemberArrayList method");
+        ArrayList<HouseHoldMember> houseHoldMemberArrayList = new ArrayList<>();
+        for (Person person : personWhoLiveAtTheSameAddress) {
+            HouseHoldMember houseHoldMember = new HouseHoldMember();
+            Optional<MedicalRecord> medicalRecord = medicalRecordRepository.findMedicalRecordByFirstNameAndLastName(person.getFirstName(), person.getLastName());
+            AgeCalculationModel ageCalculationModel = new AgeCalculationModel(medicalRecord.get().getBirthdate(), "MM/dd/yyyy");
+            String age = String.valueOf(AgeCalculator.ageCalculator(ageCalculationModel));
+            houseHoldMember.setFirstName(person.getFirstName());
+            houseHoldMember.setLastName(person.getLastName());
+            houseHoldMember.setPhoneNumber(person.getPhone());
+            houseHoldMember.setAge(age);
+            houseHoldMember.setMedication(medicalRecord.get().getMedications());
+            houseHoldMember.setAllergies(medicalRecord.get().getAllergies());
+            houseHoldMemberArrayList.add(houseHoldMember);
+        }
+        return houseHoldMemberArrayList;
     }
 }

@@ -1,5 +1,6 @@
-package com.openClassroomsProject.SafetyNetAlerts.model;
+package com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel;
 
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonCoveredByAFireStation;
 import lombok.Data;
 import java.util.ArrayList;
 import java.util.HashMap;

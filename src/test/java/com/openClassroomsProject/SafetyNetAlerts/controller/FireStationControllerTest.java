@@ -4,13 +4,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.openClassroomsProject.SafetyNetAlerts.model.PersonAndFireStationNumberWhoServedHim;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.FireStation;
-import com.openClassroomsProject.SafetyNetAlerts.model.PersonCoveredByAFireStation;
-import com.openClassroomsProject.SafetyNetAlerts.model.PersonListCoveredByAFireStation;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.HouseHold;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonAndFireStationNumberWhoServedHim;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonCoveredByAFireStation;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonListCoveredByAFireStation;
 import com.openClassroomsProject.SafetyNetAlerts.service.IFireStationService;
-import com.openClassroomsProject.SafetyNetAlerts.service.JsonDataService;
+import com.openClassroomsProject.SafetyNetAlerts.service.starter.JsonDataService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +19,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Optional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = FireStationController.class)
@@ -33,6 +32,28 @@ public class FireStationControllerTest {
     private JsonDataService jsonDataService;
     @MockBean
     private IFireStationService fireStationService;
+
+    @Test
+    public void testGetListOfHomesServedByThisStationsAndResponseIsOk() throws Exception {
+        ArrayList<HouseHold> houseHoldArrayListTest = new ArrayList<>(Collections.singletonList(new HouseHold("houseTest", new ArrayList<>())));
+        ArrayList<String> stringListTest = new ArrayList<>(Arrays.asList("test","test"));
+        when(fireStationService.getListOfHomesServedByThisStations(stringListTest)).thenReturn(houseHoldArrayListTest);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.addAll("stations",stringListTest);
+        mockMvc.perform(get("/flood/stations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(params))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetListOfHomesServedByThisStationsAndResponseIsNotFound() throws Exception {
+        when(fireStationService.getListOfHomesServedByThisStations(any(ArrayList.class))).thenReturn(new ArrayList<>());
+        mockMvc.perform(get("//flood/stations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("stations", "00", "99"))
+                .andExpect(status().isNotFound());
+    }
 
     @Test
     public void testGetPersonListAndHerFireStationNumberAndResponseIsOk() throws Exception {

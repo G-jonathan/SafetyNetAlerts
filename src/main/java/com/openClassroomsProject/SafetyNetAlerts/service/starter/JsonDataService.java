@@ -1,4 +1,4 @@
-package com.openClassroomsProject.SafetyNetAlerts.service;
+package com.openClassroomsProject.SafetyNetAlerts.service.starter;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.FireStation;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;

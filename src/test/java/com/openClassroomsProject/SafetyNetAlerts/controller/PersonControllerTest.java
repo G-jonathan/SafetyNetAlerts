@@ -4,11 +4,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import com.openClassroomsProject.SafetyNetAlerts.model.PersonInformation;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.Children;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.ChildrenAndOtherMembers;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonInformation;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
-import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
-import com.openClassroomsProject.SafetyNetAlerts.service.JsonDataService;
+import com.openClassroomsProject.SafetyNetAlerts.service.starter.JsonDataService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,28 @@ class PersonControllerTest {
     private IPersonService personService;
 
     @Test
-    void testGetPersonInformationAndResponseIsok() throws Exception {
+    void TestGetListOfChildrenLivingAtThisAddressAndResponseIsOk() throws Exception {
+        ArrayList<Children> childrenArrayListTest = new ArrayList<>();
+        ArrayList<UniqueIdentifier> UniqueIdentifierArrayListTest = new ArrayList<>();
+        Optional<ChildrenAndOtherMembers> childrenAndOtherMembersOptional = Optional.of(new ChildrenAndOtherMembers(childrenArrayListTest, UniqueIdentifierArrayListTest));
+        when(personService.getListOfChildrenLivingAtThisAddress(any(String.class))).thenReturn(childrenAndOtherMembersOptional);
+        mockMvc.perform(get("/childAlert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("address", "addressTest"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void TestGetListOfChildrenLivingAtThisAddressAndResponseIsNotFound() throws Exception {
+        when(personService.getListOfChildrenLivingAtThisAddress(any(String.class))).thenReturn(Optional.empty());
+        mockMvc.perform(get("/childAlert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("address", "addressTest"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetPersonInformationAndResponseIsOk() throws Exception {
         PersonInformation personInformationTest = new PersonInformation();
         when(personService.getPersonInformation(any(String.class), any(String.class))).thenReturn(Optional.of(personInformationTest));
         mockMvc.perform(get("/personInfo")
@@ -54,7 +77,7 @@ class PersonControllerTest {
 
     @Test
     void testGetEmailsOfCityDwellersAndResponseIsOk() throws Exception {
-        ArrayList<String> requestContent = new ArrayList<String>(Arrays.asList("emailTest@test.fr","emailTest2@test.fr"));
+        ArrayList<String> requestContent = new ArrayList<String>(Arrays.asList("emailTest@test.fr", "emailTest2@test.fr"));
         when(personService.getEmailsOfCityDwellers(any(String.class))).thenReturn(requestContent);
         mockMvc.perform(get("/communityEmail")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -141,21 +164,21 @@ class PersonControllerTest {
 
     @Test
     void testDeleteAPersonAndResponseIsOk() throws Exception {
+        String bodyContent = "{ \"firstName\":\"firstnameTest\", \"lastName\":\"lastnameTest\" }";
         when(personService.deleteAPerson(any(UniqueIdentifier.class))).thenReturn(true);
         mockMvc.perform(delete("/person")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("firstName", "firstNameTest")
-                .param("lastName", "lastNameTest"))
+                .content(bodyContent))
                 .andExpect(status().isOk());
     }
 
     @Test
     void testDeleteAPersonAndResponseIsNotFound() throws Exception {
+        String bodyContent = "{ \"firstName\":\"firstnameTest\", \"lastName\":\"lastnameTest\" }";
         when(personService.deleteAPerson(any(UniqueIdentifier.class))).thenReturn(false);
         mockMvc.perform(delete("/person")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("firstName", "firstNameTest")
-                .param("lastName", "lastNameTest"))
+                .content(bodyContent))
                 .andExpect(status().isNotFound());
     }
 }

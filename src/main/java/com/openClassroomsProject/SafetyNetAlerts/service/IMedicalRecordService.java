@@ -1,7 +1,7 @@
 package com.openClassroomsProject.SafetyNetAlerts.service;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
-import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.UniqueIdentifier;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 

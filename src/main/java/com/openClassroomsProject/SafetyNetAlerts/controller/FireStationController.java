@@ -2,9 +2,10 @@ package com.openClassroomsProject.SafetyNetAlerts.controller;
 
 import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
 import com.openClassroomsProject.SafetyNetAlerts.exception.ResourceNotFoundException;
-import com.openClassroomsProject.SafetyNetAlerts.model.PersonAndFireStationNumberWhoServedHim;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.HouseHold;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonAndFireStationNumberWhoServedHim;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.FireStation;
-import com.openClassroomsProject.SafetyNetAlerts.model.PersonListCoveredByAFireStation;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonListCoveredByAFireStation;
 import com.openClassroomsProject.SafetyNetAlerts.service.IFireStationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,23 @@ public class FireStationController {
     @Autowired
     private IFireStationService fireStationService;
     private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.FireStationController";
+
+    @GetMapping("/flood/stations")
+    public ResponseEntity<ArrayList<HouseHold>> getListOfHomesServedByThisStations(@RequestParam ArrayList<String> stations) {
+        String functionPath = CLASSPATH + ".getListOfHomesServedByThisStations";
+        log.info("Request received  in " + functionPath);
+        ArrayList<HouseHold> requestContent;
+        try {
+            requestContent = fireStationService.getListOfHomesServedByThisStations(stations);
+        } catch (Exception exception) {
+            throw new CustomGenericException(functionPath, exception);
+        }
+        if (requestContent.isEmpty()) {
+            throw new ResourceNotFoundException(functionPath, "Nothing found for this station");
+        }
+        log.info("Request success in " + functionPath);
+        return new ResponseEntity<>(requestContent, HttpStatus.OK);
+    }
 
     @GetMapping("fire")
     public ResponseEntity<ArrayList<PersonAndFireStationNumberWhoServedHim>> getPersonListAndHerFireStationNumber(@RequestParam String address) {
