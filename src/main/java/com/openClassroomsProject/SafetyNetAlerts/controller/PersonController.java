@@ -2,6 +2,7 @@ package com.openClassroomsProject.SafetyNetAlerts.controller;
 
 import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
 import com.openClassroomsProject.SafetyNetAlerts.exception.ResourceNotFoundException;
+import com.openClassroomsProject.SafetyNetAlerts.model.PersonInformation;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
@@ -21,7 +22,23 @@ public class PersonController {
     private IPersonService personService;
     private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.PersonController";
 
-
+    @GetMapping("/personInfo")
+    public ResponseEntity<PersonInformation> getPersonInformation(@RequestParam String firstName, @RequestParam String lastName) {
+        String functionPath = CLASSPATH + ".getPersonInformation";
+        log.info("Request received in " + functionPath);
+        Optional<PersonInformation> personInformation;
+        try {
+            personInformation = personService.getPersonInformation(firstName, lastName);
+        } catch (Exception exception) {
+            throw new CustomGenericException(functionPath, exception);
+        }
+        if (personInformation.isEmpty()) {
+                throw new ResourceNotFoundException(functionPath, "Nothing found for this person");
+        }
+        log.info("Request success in " + functionPath);
+        PersonInformation requestContent = personInformation.get();
+        return new ResponseEntity<>(requestContent, HttpStatus.OK);
+    }
 
     @GetMapping("/communityEmail")
     public ResponseEntity<ArrayList<String>> getEmailsOfCityDwellers(@RequestParam String city) {

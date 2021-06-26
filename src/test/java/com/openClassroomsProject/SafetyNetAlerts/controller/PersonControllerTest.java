@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.openClassroomsProject.SafetyNetAlerts.model.PersonInformation;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
@@ -29,6 +30,27 @@ class PersonControllerTest {
     private JsonDataService jsonDataService;
     @MockBean
     private IPersonService personService;
+
+    @Test
+    void testGetPersonInformationAndResponseIsok() throws Exception {
+        PersonInformation personInformationTest = new PersonInformation();
+        when(personService.getPersonInformation(any(String.class), any(String.class))).thenReturn(Optional.of(personInformationTest));
+        mockMvc.perform(get("/personInfo")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("firstName", "firstNameTest")
+                .param("lastName", "lastNameTest"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testGetPersonInformationAndResponseIsNotFound() throws Exception {
+        when(personService.getPersonInformation(any(String.class), any(String.class))).thenReturn(Optional.empty());
+        mockMvc.perform(get("/personInfo")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("firstName", "firstNameTest")
+                .param("lastName", "lastNameTest"))
+                .andExpect(status().isNotFound());
+    }
 
     @Test
     void testGetEmailsOfCityDwellersAndResponseIsOk() throws Exception {

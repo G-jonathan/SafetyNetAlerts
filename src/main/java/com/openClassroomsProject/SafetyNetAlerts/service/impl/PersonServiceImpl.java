@@ -1,10 +1,15 @@
 package com.openClassroomsProject.SafetyNetAlerts.service.impl;
 
 import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
+import com.openClassroomsProject.SafetyNetAlerts.model.AgeCalculationModel;
+import com.openClassroomsProject.SafetyNetAlerts.model.PersonInformation;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
+import com.openClassroomsProject.SafetyNetAlerts.repository.MedicalRecordRepository;
 import com.openClassroomsProject.SafetyNetAlerts.repository.PersonRepository;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
+import com.openClassroomsProject.SafetyNetAlerts.service.helper.AgeCalculator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -18,6 +23,8 @@ import java.util.Optional;
 public class PersonServiceImpl implements IPersonService {
     @Autowired
     private PersonRepository personRepository;
+    @Autowired
+    private MedicalRecordRepository medicalRecordRepository;
 
     @Override
     public Iterable<Person> getPersons() {
@@ -85,5 +92,26 @@ public class PersonServiceImpl implements IPersonService {
             emailListOfPersonsWhoLiveInThisCity.add(person.getEmail());
         }
         return emailListOfPersonsWhoLiveInThisCity;
+    }
+
+    @Override
+    public Optional<PersonInformation> getPersonInformation(String firstName, String lastName) {
+        log.debug("Entered into PersonServiceImpl.getPersonInformation method");
+        Optional<Person> person = personRepository.findPersonByFirstNameAndLastName(firstName, lastName);
+        if (person.isEmpty()) {
+            return Optional.empty();
+        }
+        Optional<MedicalRecord> medicalRecord = medicalRecordRepository.findMedicalRecordByFirstNameAndLastName(firstName, lastName);
+        AgeCalculationModel ageCalculationModel = new AgeCalculationModel(medicalRecord.get().getBirthdate(), "MM/dd/yyyy");
+        String age = String.valueOf(AgeCalculator.ageCalculator(ageCalculationModel));
+        PersonInformation personInformation = new PersonInformation();
+        personInformation.setFirstName(person.get().getFirstName());
+        personInformation.setLastName(person.get().getLastName());
+        personInformation.setAddress(person.get().getAddress());
+        personInformation.setAge(age);
+        personInformation.setEmail(person.get().getEmail());
+        personInformation.setMedications(medicalRecord.get().getMedications());
+        personInformation.setAllergies(medicalRecord.get().getAllergies());
+        return Optional.of(personInformation);
     }
 }
