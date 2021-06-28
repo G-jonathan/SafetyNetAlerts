@@ -1,8 +1,10 @@
 package com.openClassroomsProject.SafetyNetAlerts;
 
-import com.openClassroomsProject.SafetyNetAlerts.model.SafetyNetAlertData;
+import com.openClassroomsProject.SafetyNetAlerts.model.JsonFileData;
+import com.openClassroomsProject.SafetyNetAlerts.service.IDataSourceConfig;
 import com.openClassroomsProject.SafetyNetAlerts.service.starter.JsonDataService;
 import com.openClassroomsProject.SafetyNetAlerts.service.starter.SafetyNetAlertInitializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,11 +17,15 @@ public class SafetyNetAlertsApplication {
 		SpringApplication.run(SafetyNetAlertsApplication.class, args);
 	}
 
+	@Autowired
+	JsonDataService jsonDataService;
+	@Autowired
+	IDataSourceConfig dataSourceConfig;
 	@Bean
-	CommandLineRunner runnerReadJsonWithObjectMapper(JsonDataService jsonDataService) {
+	CommandLineRunner runnerReadJsonWithObjectMapper() {
 		return args -> {
-			String dataFilePath = new SafetyNetAlertData().getFILEPATH();
-			SafetyNetAlertInitializer initializer = new SafetyNetAlertInitializer(jsonDataService, dataFilePath);
+			JsonFileData data = dataSourceConfig.setupData();
+			SafetyNetAlertInitializer initializer = new SafetyNetAlertInitializer(jsonDataService, data);
 			initializer.start();
 		};
 	}
