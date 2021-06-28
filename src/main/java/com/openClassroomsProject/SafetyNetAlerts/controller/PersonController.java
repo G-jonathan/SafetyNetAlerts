@@ -2,9 +2,10 @@ package com.openClassroomsProject.SafetyNetAlerts.controller;
 
 import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
 import com.openClassroomsProject.SafetyNetAlerts.exception.ResourceNotFoundException;
-import com.openClassroomsProject.SafetyNetAlerts.model.PersonInformation;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.ChildrenAndOtherMembers;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonInformation;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
-import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,24 @@ public class PersonController {
     private IPersonService personService;
     private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.PersonController";
 
+    @GetMapping("/childAlert")
+    public ResponseEntity<ChildrenAndOtherMembers> getListOfChildrenLivingAtThisAddress(@RequestParam String address) {
+        String functionPath = CLASSPATH + ".getListOfChildrenLivingAtThisAddress";
+        log.info("Request received in " + functionPath);
+        Optional<ChildrenAndOtherMembers> childrenAndOtherMembersOptional;
+        try {
+            childrenAndOtherMembersOptional = personService.getListOfChildrenLivingAtThisAddress(address);
+        } catch (Exception exception) {
+            throw new CustomGenericException(functionPath, exception);
+        }
+        if (childrenAndOtherMembersOptional.isEmpty()) {
+            throw new ResourceNotFoundException(functionPath, "Nothing found for this address");
+        }
+        log.info("Request success in " + functionPath);
+        ChildrenAndOtherMembers childrenAndOtherMembers = childrenAndOtherMembersOptional.get();
+        return new ResponseEntity<>(childrenAndOtherMembers, HttpStatus.OK);
+    }
+
     @GetMapping("/personInfo")
     public ResponseEntity<PersonInformation> getPersonInformation(@RequestParam String firstName, @RequestParam String lastName) {
         String functionPath = CLASSPATH + ".getPersonInformation";
@@ -33,7 +52,7 @@ public class PersonController {
             throw new CustomGenericException(functionPath, exception);
         }
         if (personInformation.isEmpty()) {
-                throw new ResourceNotFoundException(functionPath, "Nothing found for this person");
+            throw new ResourceNotFoundException(functionPath, "Nothing found for this person");
         }
         log.info("Request success in " + functionPath);
         PersonInformation requestContent = personInformation.get();

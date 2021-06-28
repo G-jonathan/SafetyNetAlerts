@@ -1,4 +1,4 @@
-package com.openClassroomsProject.SafetyNetAlerts.model;
+package com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel;
 
 import lombok.Data;
 

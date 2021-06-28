@@ -1,9 +1,9 @@
 package com.openClassroomsProject.SafetyNetAlerts.controller;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
-import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IMedicalRecordService;
-import com.openClassroomsProject.SafetyNetAlerts.service.JsonDataService;
+import com.openClassroomsProject.SafetyNetAlerts.service.starter.JsonDataService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,7 +52,7 @@ class MedicalRecordControllerTest {
         medicalRecordTest.setBirthdate("00/00/0000");
         medicalRecordTest.setMedications(List.of("medicationsTest1:999mg", "medicationsTest2:000mg"));
         medicalRecordTest.setAllergies(List.of("allergiesTest1"));
-        String bodyContent ="{ \"firstName\":\"firstnameTest\", \"lastName\":\"lastnameTest\", \"birthdate\":\"01/01/0001\", \"medications\":[\"medicationTest1:111mg\", \"medicationTest2:222mg\"], \"allergies\":[\"allergiesTest1\"] }";
+        String bodyContent = "{ \"firstName\":\"firstnameTest\", \"lastName\":\"lastnameTest\", \"birthdate\":\"01/01/0001\", \"medications\":[\"medicationTest1:111mg\", \"medicationTest2:222mg\"], \"allergies\":[\"allergiesTest1\"] }";
         when(medicalRecordService.updateAnExistingMedicalRecord(any(MedicalRecord.class))).thenReturn(Optional.of(medicalRecordTest));
         mockMvc.perform(put("/medicalRecord")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -62,7 +62,7 @@ class MedicalRecordControllerTest {
 
     @Test
     void testUpdateAnExistingMedicalRecordAndResponseIsNotFound() throws Exception {
-        String bodyContent ="{ \"firstName\":\"firstnameTest\", \"lastName\":\"lastnameTest\", \"birthdate\":\"01/01/0001\", \"medications\":[\"medicationTest1:111mg\", \"medicationTest2:222mg\"], \"allergies\":[\"allergiesTest1\"] }";
+        String bodyContent = "{ \"firstName\":\"firstnameTest\", \"lastName\":\"lastnameTest\", \"birthdate\":\"01/01/0001\", \"medications\":[\"medicationTest1:111mg\", \"medicationTest2:222mg\"], \"allergies\":[\"allergiesTest1\"] }";
         when(medicalRecordService.updateAnExistingMedicalRecord(any(MedicalRecord.class))).thenReturn(Optional.empty());
         mockMvc.perform(put("/medicalRecord")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -72,21 +72,21 @@ class MedicalRecordControllerTest {
 
     @Test
     void testDeleteAMedicalRecordAndResponseIsOk() throws Exception {
+        String bodyContent = "{ \"firstName\":\"firstnameTest\", \"lastName\":\"lastnameTest\" }";
         when(medicalRecordService.deleteAMedicalRecord(any(UniqueIdentifier.class))).thenReturn(true);
         mockMvc.perform(delete("/medicalRecord")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("firstName", "firstNameTest")
-                .param("lastName", "lastNameTest"))
+                .content(bodyContent))
                 .andExpect(status().isOk());
     }
 
     @Test
     void testDeleteAMedicalRecordAndResponseIsNotFound() throws Exception {
+        String bodyContent = "{ \"firstName\":\"firstnameTest\", \"lastName\":\"lastnameTest\" }";
         when(medicalRecordService.deleteAMedicalRecord(any(UniqueIdentifier.class))).thenReturn(false);
         mockMvc.perform(delete("/medicalRecord")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("firstName", "firstNameTest")
-                .param("lastName", "lastNameTest"))
+                .content(bodyContent))
                 .andExpect(status().isNotFound());
     }
 }

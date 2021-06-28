@@ -1,7 +1,7 @@
 package com.openClassroomsProject.SafetyNetAlerts.service.impl;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
-import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.repository.MedicalRecordRepository;
 import com.openClassroomsProject.SafetyNetAlerts.service.IMedicalRecordService;
 import lombok.extern.slf4j.Slf4j;

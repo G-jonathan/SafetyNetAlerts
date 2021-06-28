@@ -1,11 +1,13 @@
 package com.openClassroomsProject.SafetyNetAlerts.service.impl;
 
 import com.openClassroomsProject.SafetyNetAlerts.exception.CustomGenericException;
-import com.openClassroomsProject.SafetyNetAlerts.model.AgeCalculationModel;
-import com.openClassroomsProject.SafetyNetAlerts.model.PersonInformation;
+import com.openClassroomsProject.SafetyNetAlerts.model.*;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
-import com.openClassroomsProject.SafetyNetAlerts.model.UniqueIdentifier;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.Children;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.ChildrenAndOtherMembers;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonInformation;
+import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.repository.MedicalRecordRepository;
 import com.openClassroomsProject.SafetyNetAlerts.repository.PersonRepository;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
@@ -113,5 +115,34 @@ public class PersonServiceImpl implements IPersonService {
         personInformation.setMedications(medicalRecord.get().getMedications());
         personInformation.setAllergies(medicalRecord.get().getAllergies());
         return Optional.of(personInformation);
+    }
+
+    @Override
+    public Optional<ChildrenAndOtherMembers> getListOfChildrenLivingAtThisAddress(String address) {
+        ArrayList<Person> personAtThisAddress = personRepository.findPersonByAddress(address);
+        if (personAtThisAddress.isEmpty()) {
+            return Optional.empty();
+        }
+        ChildrenAndOtherMembers childrenAndOtherMembers = buildChildrenAndOtherMembers(personAtThisAddress);
+        if (childrenAndOtherMembers.getChildrenArrayList().isEmpty()) {
+            return Optional.of(new ChildrenAndOtherMembers(new ArrayList<>(), new ArrayList<>()));
+        }
+        return Optional.of(childrenAndOtherMembers);
+    }
+
+    private ChildrenAndOtherMembers buildChildrenAndOtherMembers(ArrayList<Person> personAtThisAddress) {
+        ArrayList<Children> childrenArrayList = new ArrayList<>();
+        ArrayList<UniqueIdentifier> uniqueIdentifierArrayList = new ArrayList<>();
+        for (Person person : personAtThisAddress) {
+            Optional<MedicalRecord> medicalRecord = medicalRecordRepository.findMedicalRecordByFirstNameAndLastName(person.getFirstName(), person.getLastName());
+            AgeCalculationModel ageCalculationModel = new AgeCalculationModel(medicalRecord.get().getBirthdate(), "MM/dd/yyyy");
+            int age = AgeCalculator.ageCalculator(ageCalculationModel);
+            if (age < 19) {
+                childrenArrayList.add(new Children(person.getFirstName(), person.getLastName(), String.valueOf(age)));
+            } else {
+                uniqueIdentifierArrayList.add(new UniqueIdentifier(person.getFirstName(), person.getLastName()));
+            }
+        }
+        return new ChildrenAndOtherMembers(childrenArrayList, uniqueIdentifierArrayList);
     }
 }

@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 public class AgeCalculator {
-    
+
     public static int ageCalculator(AgeCalculationModel ageCalculationModel) {
         String pattern = ageCalculationModel.getPattern();
         String birthDate = ageCalculationModel.getBirthdate();

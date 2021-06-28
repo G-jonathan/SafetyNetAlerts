@@ -1,4 +1,4 @@
-package com.openClassroomsProject.SafetyNetAlerts.model;
+package com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel;
 
 import lombok.Data;
 import javax.validation.constraints.NotNull;
@@ -12,6 +12,11 @@ public class UniqueIdentifier {
     @NotNull(message = "lastName is mandatory")
     @Size(min = 2, max = 40, message = "lastName must be between 2 and 40 characters long.")
     private final String lastName;
+
+    public UniqueIdentifier(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 
     @Override
     public String toString() {
