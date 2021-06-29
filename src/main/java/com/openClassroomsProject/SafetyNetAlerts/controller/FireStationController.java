@@ -41,7 +41,7 @@ public class FireStationController {
         return new ResponseEntity<>(requestContent, HttpStatus.OK);
     }
 
-    @GetMapping("fire")
+    @GetMapping("/fire")
     public ResponseEntity<ArrayList<PersonAndFireStationNumberWhoServedHim>> getPersonListAndHerFireStationNumber(@RequestParam String address) {
         String functionPath = CLASSPATH + ".PersonAndFireStationNumberWhoServedHim";
         log.info("Request received  in " + functionPath);
@@ -93,10 +93,10 @@ public class FireStationController {
     }
 
     @GetMapping("/fireStation")
-    public Iterable<FireStation> getFireStations() {
+    public ArrayList<FireStation> getFireStations() {
         String functionPath = CLASSPATH + ".getFireStations";
         log.info("Request received  in " + functionPath);
-        Iterable<FireStation> requestContent;
+        ArrayList<FireStation> requestContent;
         try {
             requestContent = fireStationService.getFireStations();
         } catch (Exception exception) {
@@ -111,12 +111,15 @@ public class FireStationController {
         String functionPath = CLASSPATH + ".addStationAndAddressMapping";
         log.info("Request received  in " + functionPath);
         try {
-            fireStationService.addStationAndAddressMapping(firestation);
+            Optional<FireStation> fireStationAdded= fireStationService.addStationAndAddressMapping(firestation);
+            if (fireStationAdded.isPresent()) {
+                log.info("Request success in " + functionPath);
+                return new ResponseEntity<>(firestation + "\n" + " --> has been successfully created", HttpStatus.CREATED);
+            }
         } catch (Exception exception) {
             throw new CustomGenericException(functionPath, exception);
         }
-        log.info("Request success in " + functionPath);
-        return new ResponseEntity<>(firestation + "\n" + " --> has been successfully created", HttpStatus.CREATED);
+        throw new ResourceNotFoundException(functionPath, "FireStation address already exist");
     }
 
     @PutMapping("/fireStation")

@@ -24,12 +24,17 @@ import java.util.Optional;
 @Slf4j
 public class PersonServiceImpl implements IPersonService {
     @Autowired
-    private PersonRepository personRepository;
+    private final PersonRepository personRepository;
     @Autowired
-    private MedicalRecordRepository medicalRecordRepository;
+    private final MedicalRecordRepository medicalRecordRepository;
+
+    public PersonServiceImpl(PersonRepository personRepository, MedicalRecordRepository medicalRecordRepository) {
+        this.personRepository = personRepository;
+        this.medicalRecordRepository = medicalRecordRepository;
+    }
 
     @Override
-    public Iterable<Person> getPersons() {
+    public ArrayList<Person> getPersons() {
         try {
             return personRepository.findAll();
         } catch (Exception e) {
@@ -39,12 +44,17 @@ public class PersonServiceImpl implements IPersonService {
     }
 
     @Override
-    public void addNewPerson(Person person) {
+    public Optional<Person> addNewPerson(Person person) {
         try {
+            Optional<Person> personToCreate = personRepository.findPersonByFirstNameAndLastName(person.getFirstName(), person.getLastName());
+            if (personToCreate.isPresent()){
+                return Optional.empty();
+            }
             personRepository.save(person);
         } catch (Exception e) {
             System.out.println("Error attempting to add a new person in [PersonServiceImpl/addNewPerson] method");
         }
+        return Optional.of(person);
     }
 
     @Override
@@ -104,16 +114,21 @@ public class PersonServiceImpl implements IPersonService {
             return Optional.empty();
         }
         Optional<MedicalRecord> medicalRecord = medicalRecordRepository.findMedicalRecordByFirstNameAndLastName(firstName, lastName);
-        AgeCalculationModel ageCalculationModel = new AgeCalculationModel(medicalRecord.get().getBirthdate(), "MM/dd/yyyy");
-        String age = String.valueOf(AgeCalculator.ageCalculator(ageCalculationModel));
         PersonInformation personInformation = new PersonInformation();
+        if (medicalRecord.isPresent()){
+            AgeCalculationModel ageCalculationModel = new AgeCalculationModel(medicalRecord.get().getBirthdate(), "MM/dd/yyyy");
+            personInformation.setAge(String.valueOf(AgeCalculator.ageCalculator(ageCalculationModel)));
+            personInformation.setMedications(medicalRecord.get().getMedications());
+            personInformation.setAllergies(medicalRecord.get().getAllergies());
+        } else {
+            personInformation.setMedications(new ArrayList<>());
+            personInformation.setAllergies(new ArrayList<>());
+            personInformation.setAge("?");
+        }
         personInformation.setFirstName(person.get().getFirstName());
         personInformation.setLastName(person.get().getLastName());
         personInformation.setAddress(person.get().getAddress());
-        personInformation.setAge(age);
         personInformation.setEmail(person.get().getEmail());
-        personInformation.setMedications(medicalRecord.get().getMedications());
-        personInformation.setAllergies(medicalRecord.get().getAllergies());
         return Optional.of(personInformation);
     }
 
@@ -130,14 +145,18 @@ public class PersonServiceImpl implements IPersonService {
         return Optional.of(childrenAndOtherMembers);
     }
 
-    private ChildrenAndOtherMembers buildChildrenAndOtherMembers(ArrayList<Person> personAtThisAddress) {
+    @Override
+    public ChildrenAndOtherMembers buildChildrenAndOtherMembers(ArrayList<Person> personAtThisAddress) {
         ArrayList<Children> childrenArrayList = new ArrayList<>();
         ArrayList<UniqueIdentifier> uniqueIdentifierArrayList = new ArrayList<>();
         for (Person person : personAtThisAddress) {
             Optional<MedicalRecord> medicalRecord = medicalRecordRepository.findMedicalRecordByFirstNameAndLastName(person.getFirstName(), person.getLastName());
-            AgeCalculationModel ageCalculationModel = new AgeCalculationModel(medicalRecord.get().getBirthdate(), "MM/dd/yyyy");
-            int age = AgeCalculator.ageCalculator(ageCalculationModel);
-            if (age < 19) {
+            int age = -1;
+            if (medicalRecord.isPresent()) {
+                AgeCalculationModel ageCalculationModel = new AgeCalculationModel(medicalRecord.get().getBirthdate(), "MM/dd/yyyy");
+                age = AgeCalculator.ageCalculator(ageCalculationModel);
+            }
+            if (age < 19 && age != -1) {
                 childrenArrayList.add(new Children(person.getFirstName(), person.getLastName(), String.valueOf(age)));
             } else {
                 uniqueIdentifierArrayList.add(new UniqueIdentifier(person.getFirstName(), person.getLastName()));

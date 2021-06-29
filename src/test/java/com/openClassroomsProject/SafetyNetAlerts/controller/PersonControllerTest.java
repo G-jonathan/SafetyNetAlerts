@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.openClassroomsProject.SafetyNetAlerts.TestDataSourceConfigImpl;
 import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.Children;
 import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.ChildrenAndOtherMembers;
 import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonInformation;
@@ -16,13 +17,17 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+@Import(TestDataSourceConfigImpl.class)
+@ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = PersonController.class)
 class PersonControllerTest {
@@ -112,10 +117,29 @@ class PersonControllerTest {
                 "\"phone\":\"111111111\",\n" +
                 "\"email\":\"emailTest.com\"\n" +
                 "}";
+        when(personService.addNewPerson(any(Person.class))).thenReturn(Optional.of(new Person()));
         mockMvc.perform(post("/person")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bodyContent))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void testAddNewPersonAndResponseIsNotFound() throws Exception {
+        String bodyContent = "{\n" +
+                "\"firstName\":\"firstNameTest\",\n" +
+                "\"lastName\":\"lastNameTest\",\n" +
+                "\"address\":\"AddressTest\",\n" +
+                "\"city\":\"cityTest\",\n" +
+                "\"zip\":\"11111\",\n" +
+                "\"phone\":\"111111111\",\n" +
+                "\"email\":\"emailTest.com\"\n" +
+                "}";
+        when(personService.addNewPerson(any(Person.class))).thenReturn(Optional.empty());
+        mockMvc.perform(post("/person")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(bodyContent))
+                .andExpect(status().isNotFound());
     }
 
     @Test

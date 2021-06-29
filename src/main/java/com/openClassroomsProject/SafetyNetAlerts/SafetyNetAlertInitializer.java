@@ -1,6 +1,7 @@
-package com.openClassroomsProject.SafetyNetAlerts.service.starter;
+package com.openClassroomsProject.SafetyNetAlerts;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.JsonFileData;
+import com.openClassroomsProject.SafetyNetAlerts.service.starter.JsonDataService;
 import org.springframework.stereotype.Component;
 
 @Component
