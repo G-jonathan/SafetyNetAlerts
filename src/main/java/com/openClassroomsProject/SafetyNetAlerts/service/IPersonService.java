@@ -12,9 +12,11 @@ import java.util.Optional;
 @Service
 public interface IPersonService {
 
-    Iterable<Person> getPersons();
+    ChildrenAndOtherMembers buildChildrenAndOtherMembers(ArrayList<Person> personAtThisAddress);
 
-    void addNewPerson(Person person);
+    ArrayList<Person> getPersons();
+
+    Optional<Person> addNewPerson(Person person);
 
     Optional<Person> updateAnExistingPerson(Person person);
 

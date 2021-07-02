@@ -25,69 +25,69 @@ import java.util.Optional;
 @Slf4j
 public class FireStationServiceImpl implements IFireStationService {
     @Autowired
-    private FireStationRepository fireStationRepository;
+    private final FireStationRepository fireStationRepository;
     @Autowired
-    private PersonRepository personRepository;
+    private final PersonRepository personRepository;
     @Autowired
-    private MedicalRecordRepository medicalRecordRepository;
+    private final MedicalRecordRepository medicalRecordRepository;
+
+    public FireStationServiceImpl(FireStationRepository fireStationRepository, PersonRepository personRepository, MedicalRecordRepository medicalRecordRepository) {
+        this.fireStationRepository = fireStationRepository;
+        this.personRepository = personRepository;
+        this.medicalRecordRepository = medicalRecordRepository;
+    }
 
     @Override
-    public Iterable<FireStation> getFireStations() {
+    public ArrayList<FireStation> getFireStations() {
+        log.debug("Entered into FireStationServiceImpl.getFireStations method");
         return fireStationRepository.findAll();
     }
 
     @Override
-    public void addStationAndAddressMapping(FireStation fireStation) {
-        try {
+    public Optional<FireStation> addStationAndAddressMapping(FireStation fireStation) throws CustomGenericException {
+        log.debug("Entered into FireStationServiceImpl.addStationAndAddressMapping method");
+        Optional<FireStation> isFireStationAddressAlreadyExist = fireStationRepository.findByAddress(fireStation.getAddress());
+        if (isFireStationAddressAlreadyExist.isEmpty()) {
             fireStationRepository.save(fireStation);
-        } catch (Exception e) {
-            System.out.println("Error attempting to add data in [addStationAndAddressMapping] method");
-        }
-    }
-
-    @Override
-    public Optional<FireStation> updateFireStationNumberOfAnAddress(FireStation fireStation) {
-        try {
-            Optional<FireStation> fireStationToUpdate = fireStationRepository.findByAddress(fireStation.getAddress());
-            if (fireStationToUpdate.isPresent()) {
-                FireStation fireStationUpdated = fireStationToUpdate.get();
-                fireStationUpdated.setStation(fireStation.getStation());
-                fireStationRepository.save(fireStationUpdated);
-                return Optional.of(fireStationUpdated);
-            }
-        } catch (Exception e) {
-            System.out.println("Error attempting to update data in [updateFireStationNumberToAnAddress] method");
+            return Optional.of(fireStation);
         }
         return Optional.empty();
     }
 
     @Override
-    public Optional<List<FireStation>> deleteMappingOfAStation(String stationNumber) {
-        Optional<List<FireStation>> fireStationsToDelete = fireStationRepository.findByStation(stationNumber);
-        //TODO condition always true
-        if (fireStationsToDelete.isPresent()) {
-            try {
-                List<FireStation> _fireStationsToDelete = fireStationsToDelete.get();
-                for (FireStation currentFireStation : _fireStationsToDelete) {
-                    fireStationRepository.delete(currentFireStation);
-                }
-            } catch (Exception e) {
-                System.out.println("Error attempting to delete data in [deleteMappingOfAStation] method");
-            }
+    public Optional<FireStation> updateFireStationNumberOfAnAddress(FireStation fireStation) throws CustomGenericException {
+        log.debug("Entered into FireStationServiceImpl.updateFireStationNumberOfAnAddress method");
+        Optional<FireStation> fireStationToUpdate = fireStationRepository.findByAddress(fireStation.getAddress());
+        if (fireStationToUpdate.isPresent()) {
+            FireStation fireStationUpdated = fireStationToUpdate.get();
+            fireStationUpdated.setStation(fireStation.getStation());
+            fireStationRepository.save(fireStationUpdated);
+            return Optional.of(fireStationUpdated);
         }
-        return fireStationsToDelete;
+        return Optional.empty();
     }
 
     @Override
-    public Optional<FireStation> deleteMappingOfAnAddress(String address) {
+    public Optional<List<FireStation>> deleteMappingOfAStation(String stationNumber) throws CustomGenericException {
+        log.debug("Entered into FireStationServiceImpl.deleteMappingOfAStation method");
+        Optional<List<FireStation>> fireStationsToDelete = fireStationRepository.findByStation(stationNumber);
+        if (fireStationsToDelete.isPresent()) {
+            List<FireStation> _fireStationsToDelete = fireStationsToDelete.get();
+            for (FireStation currentFireStation : _fireStationsToDelete) {
+                fireStationRepository.delete(currentFireStation);
+            }
+            return fireStationsToDelete;
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<FireStation> deleteMappingOfAnAddress(String address) throws CustomGenericException {
+        log.debug("Entered into FireStationServiceImpl.deleteMappingOfAnAddress method");
         Optional<FireStation> fireStationToDelete = fireStationRepository.findByAddress(address);
         if (fireStationToDelete.isPresent()) {
-            try {
-                FireStation _fireStationToDelete = fireStationToDelete.get();
-                fireStationRepository.delete(_fireStationToDelete);
-            } catch (Exception e) {
-                System.out.println("Error attempting to delete data in [deleteMappingOfAnAddress] method");
-            }
+            FireStation _fireStationToDelete = fireStationToDelete.get();
+            fireStationRepository.delete(_fireStationToDelete);
         }
         return fireStationToDelete;
     }
@@ -110,7 +110,7 @@ public class FireStationServiceImpl implements IFireStationService {
     }
 
     @Override
-    public Optional<PersonListCoveredByAFireStation> getPersonListCoveredByAFireStation(String fireStationNumber) {
+    public Optional<PersonListCoveredByAFireStation> getPersonListCoveredByAFireStation(String fireStationNumber) throws CustomGenericException {
         log.debug("Entered into FireStationServiceImpl.getPersonListCoveredByAFireStation method");
         ArrayList<FireStation> fireStationWhoContainsThisFireStationNumber = fireStationRepository.findFireStationByStation(fireStationNumber);
         if (fireStationWhoContainsThisFireStationNumber.isEmpty()) {
@@ -138,7 +138,8 @@ public class FireStationServiceImpl implements IFireStationService {
         return Optional.of(personListCoveredByAFireStation);
     }
 
-    public HashMap<String, String> calculationOfTheNumberOfAdultsAndChildren(ArrayList<UniqueIdentifier> uniqueIdentifierArrayList) {
+    @Override
+    public HashMap<String, String> calculationOfTheNumberOfAdultsAndChildren(ArrayList<UniqueIdentifier> uniqueIdentifierArrayList) throws CustomGenericException {
         log.debug("Entered into FireStationServiceImpl.calculationOfTheNumberOfAdultsAndChildren method");
         int adults = 0;
         int children = 0;
@@ -164,10 +165,13 @@ public class FireStationServiceImpl implements IFireStationService {
     }
 
     @Override
-    public ArrayList<PersonAndFireStationNumberWhoServedHim> getPersonListAndHerFireStationNumber(String address) {
+    public ArrayList<PersonAndFireStationNumberWhoServedHim> getPersonListAndHerFireStationNumber(String address) throws CustomGenericException {
         log.debug("Entered into FireStationServiceImpl.getPersonListAndHerFireStationNumber method");
         ArrayList<Person> personWhoLiveAtThisAddress = personRepository.findPersonByAddress(address);
         ArrayList<PersonAndFireStationNumberWhoServedHim> personAndFireStationNumberWhoServedHimArrayList = new ArrayList<>();
+        if (personWhoLiveAtThisAddress.isEmpty()) {
+            return personAndFireStationNumberWhoServedHimArrayList;
+        }
         for (Person person : personWhoLiveAtThisAddress) {
             Optional<FireStation> fireStation = fireStationRepository.findByAddress(person.getAddress());
             String fireStationAddress = fireStation.get().getStation();
@@ -188,22 +192,25 @@ public class FireStationServiceImpl implements IFireStationService {
     }
 
     @Override
-    public ArrayList<HouseHold> getListOfHomesServedByThisStations(ArrayList<String> stationsNumbers) {
+    public ArrayList<HouseHold> getListOfHomesServedByThisStations(ArrayList<String> stationsNumbers) throws CustomGenericException {
         log.debug("Entered into FireStationServiceImpl.getListOfHomesServedByThisStations method");
         ArrayList<HouseHold> houseHoldArrayList = new ArrayList<>();
         for (String station : stationsNumbers) {
             ArrayList<FireStation> fireStationWhoContainsThisFireStationNumber = fireStationRepository.findFireStationByStation(station);
-            for (FireStation fireStation : fireStationWhoContainsThisFireStationNumber) {
-                ArrayList<Person> personWhoLiveAtThisAddress = personRepository.findPersonByAddress(fireStation.getAddress());
-                ArrayList<HouseHoldMember> houseHoldMemberArrayList = buildHouseHoldMemberArrayList(personWhoLiveAtThisAddress);
-                HouseHold houseHold = new HouseHold(fireStation.getAddress(), houseHoldMemberArrayList);
-                houseHoldArrayList.add(houseHold);
+            if (!fireStationWhoContainsThisFireStationNumber.isEmpty()) {
+                for (FireStation fireStation : fireStationWhoContainsThisFireStationNumber) {
+                    ArrayList<Person> personWhoLiveAtThisAddress = personRepository.findPersonByAddress(fireStation.getAddress());
+                    ArrayList<HouseHoldMember> houseHoldMemberArrayList = buildHouseHoldMemberArrayList(personWhoLiveAtThisAddress);
+                    HouseHold houseHold = new HouseHold(fireStation.getAddress(), houseHoldMemberArrayList);
+                    houseHoldArrayList.add(houseHold);
+                }
             }
         }
         return houseHoldArrayList;
     }
 
-    public ArrayList<HouseHoldMember> buildHouseHoldMemberArrayList(ArrayList<Person> personWhoLiveAtTheSameAddress) {
+    @Override
+    public ArrayList<HouseHoldMember> buildHouseHoldMemberArrayList(ArrayList<Person> personWhoLiveAtTheSameAddress) throws CustomGenericException {
         log.debug("Entered into FireStationServiceImpl.buildHouseHoldMemberArrayList method");
         ArrayList<HouseHoldMember> houseHoldMemberArrayList = new ArrayList<>();
         for (Person person : personWhoLiveAtTheSameAddress) {

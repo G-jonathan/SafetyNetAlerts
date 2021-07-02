@@ -1,13 +1,16 @@
 package com.openClassroomsProject.SafetyNetAlerts.service.impl;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
+import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.repository.MedicalRecordRepository;
+import com.openClassroomsProject.SafetyNetAlerts.repository.PersonRepository;
 import com.openClassroomsProject.SafetyNetAlerts.service.IMedicalRecordService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Primary
@@ -15,10 +18,17 @@ import java.util.Optional;
 @Slf4j
 public class MedicalRecordServiceImpl implements IMedicalRecordService {
     @Autowired
-    private MedicalRecordRepository medicalRecordRepository;
+    private final MedicalRecordRepository medicalRecordRepository;
+    @Autowired
+    private final PersonRepository personRepository;
+
+    public MedicalRecordServiceImpl(MedicalRecordRepository medicalRecordRepository, PersonRepository personRepository) {
+        this.medicalRecordRepository = medicalRecordRepository;
+        this.personRepository = personRepository;
+    }
 
     @Override
-    public Iterable<MedicalRecord> getMedicalRecords() {
+    public ArrayList<MedicalRecord> getMedicalRecords() {
         try {
             return medicalRecordRepository.findAll();
         } catch (Exception e) {
@@ -28,12 +38,19 @@ public class MedicalRecordServiceImpl implements IMedicalRecordService {
     }
 
     @Override
-    public void addMedicalRecord(MedicalRecord medicalRecord) {
+    public boolean addMedicalRecord(MedicalRecord medicalRecord) {
+        log.debug("Entered into MedicalRecordServiceImpl.addMedicalRecord method");
         try {
-            medicalRecordRepository.save(medicalRecord);
+            Optional<MedicalRecord> isMedicalRecordExist = medicalRecordRepository.findMedicalRecordByFirstNameAndLastName(medicalRecord.getFirstName(), medicalRecord.getLastName());
+            Optional<Person> isPersonExist = personRepository.findPersonByFirstNameAndLastName(medicalRecord.getFirstName(), medicalRecord.getLastName());
+            if (isMedicalRecordExist.isPresent() || isPersonExist.isEmpty()) {
+                return false;
+            }
         } catch (Exception e) {
-            System.out.println("Error attempting to add a new person in [MedicalRecordServiceImpl/addMedicalRecord] method");
+            log.error("Error attempting to add a medical records in [MedicalRecordServiceImpl.addMedicalRecord] method");
         }
+        medicalRecordRepository.save(medicalRecord);
+        return true;
     }
 
     @Override

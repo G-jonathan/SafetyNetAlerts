@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
@@ -22,10 +23,10 @@ public class MedicalRecordController {
     private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.MedicalRecordController";
 
     @GetMapping
-    public Iterable<MedicalRecord> getMedicalRecords() {
+    public ArrayList<MedicalRecord> getMedicalRecords() {
         String functionPath = CLASSPATH + ".getMedicalRecords";
         log.info("Request received  in " + functionPath);
-        Iterable<MedicalRecord> requestContent;
+        ArrayList<MedicalRecord> requestContent;
         try {
             requestContent = medicalRecordService.getMedicalRecords();
         } catch (Exception exception) {
@@ -40,12 +41,15 @@ public class MedicalRecordController {
         String functionPath = CLASSPATH + ".addMedicalRecord";
         log.info("Request received  in " + functionPath);
         try {
-            medicalRecordService.addMedicalRecord(medicalRecord);
+            boolean response = medicalRecordService.addMedicalRecord(medicalRecord);
+            if (response) {
+                log.info("Request success in " + functionPath);
+                return new ResponseEntity<>(medicalRecord + "\n" + " --> has been successfully created", HttpStatus.CREATED);
+            }
         } catch (Exception exception) {
             throw new CustomGenericException(functionPath, exception);
         }
-        log.info("Request success in " + functionPath);
-        return new ResponseEntity<>(medicalRecord + "\n" + " --> has been successfully created", HttpStatus.CREATED);
+        return new ResponseEntity<>("Person does not exist or medical file already exists ", HttpStatus.CONFLICT);
     }
 
     @PutMapping

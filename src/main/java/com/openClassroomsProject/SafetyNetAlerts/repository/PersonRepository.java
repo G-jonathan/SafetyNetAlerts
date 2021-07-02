@@ -9,6 +9,8 @@ import java.util.Optional;
 @Repository
 public interface PersonRepository extends CrudRepository<Person, Long> {
 
+    ArrayList<Person> findAll();
+
     Optional<Person> findPersonByFirstNameAndLastName(String firstName, String lastName);
 
     ArrayList<Person> findPersonByCity(String city);

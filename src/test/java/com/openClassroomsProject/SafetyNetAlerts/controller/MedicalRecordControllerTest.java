@@ -1,5 +1,6 @@
 package com.openClassroomsProject.SafetyNetAlerts.controller;
 
+import com.openClassroomsProject.SafetyNetAlerts.TestDataSourceConfigImpl;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
 import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IMedicalRecordService;
@@ -13,12 +14,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Optional;
 
+@Import(TestDataSourceConfigImpl.class)
+@ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = MedicalRecordController.class)
 class MedicalRecordControllerTest {
@@ -37,11 +42,22 @@ class MedicalRecordControllerTest {
 
     @Test
     void testAddMedicalRecordAndResponseIsOk() throws Exception {
-        String bodyContent = "{ \"firstName\":\"firstnameTest\", \"lastName\":\"lastnameTest\", \"birthdate\":\"01/01/0001\", \"medications\":[\"medicationTest1:111mg\", \"medicationTest2:222mg\"], \"allergies\":[\"allergiesTest1\"] }";
+        String bodyContent = "{ \"firstName\":\"firstNameTest\", \"lastName\":\"lastnameTest\", \"birthdate\":\"01/01/0001\", \"medications\":[\"medicationTest1:111mg\", \"medicationTest2:222mg\"], \"allergies\":[\"allergiesTest1\"] }";
+        when(medicalRecordService.addMedicalRecord(any(MedicalRecord.class))).thenReturn(true);
         mockMvc.perform(post("/medicalRecord")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bodyContent))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void testAddMedicalRecordAndResponseIsConflict() throws Exception {
+        String bodyContent = "{ \"firstName\":\"firstNameTest\", \"lastName\":\"lastnameTest\", \"birthdate\":\"01/01/0001\", \"medications\":[\"medicationTest1:111mg\", \"medicationTest2:222mg\"], \"allergies\":[\"allergiesTest1\"] }";
+        when(medicalRecordService.addMedicalRecord(any(MedicalRecord.class))).thenReturn(false);
+        mockMvc.perform(post("/medicalRecord")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(bodyContent))
+                .andExpect(status().isConflict());
     }
 
     @Test

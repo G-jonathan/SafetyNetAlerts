@@ -77,10 +77,10 @@ public class PersonController {
     }
 
     @GetMapping("/person")
-    public Iterable<Person> getPersons() {
+    public ArrayList<Person> getPersons() {
         String functionPath = CLASSPATH + ".getPersons";
         log.info("Request received in " + functionPath);
-        Iterable<Person> requestContent;
+        ArrayList<Person> requestContent;
         try {
             requestContent = personService.getPersons();
         } catch (Exception exception) {
@@ -95,12 +95,15 @@ public class PersonController {
         String functionPath = CLASSPATH + ".addNewPerson";
         log.info("Request received in " + functionPath);
         try {
-            personService.addNewPerson(person);
+            Optional<Person> personCreated = personService.addNewPerson(person);
+            if (personCreated.isPresent()) {
+                log.info("Request success in " + functionPath +" -> Person successfully added: " + personCreated);
+                return new ResponseEntity<>(personCreated + "\n" + " --> has been successfully modified", HttpStatus.CREATED);
+            }
         } catch (Exception exception) {
             throw new CustomGenericException(functionPath, exception);
         }
-        log.info("Request success in " + functionPath);
-        return new ResponseEntity<>(person + "\n" + " --> has been successfully created", HttpStatus.CREATED);
+        throw new ResourceNotFoundException(functionPath, "Person Already exist");
     }
 
     @PutMapping("/person")
@@ -110,7 +113,7 @@ public class PersonController {
         try {
             Optional<Person> personUpdated = personService.updateAnExistingPerson(person);
             if (personUpdated.isPresent()) {
-                log.info("Request success. Person successfully modified: ");
+                log.info("Request success in " + functionPath +" -> Person successfully modified: " + personUpdated);
                 return new ResponseEntity<>(personUpdated + "\n" + " --> has been successfully modified", HttpStatus.OK);
             }
         } catch (Exception exception) {

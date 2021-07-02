@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.openClassroomsProject.SafetyNetAlerts.TestDataSourceConfigImpl;
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.FireStation;
 import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.HouseHold;
 import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonAndFireStationNumberWhoServedHim;
@@ -16,13 +17,17 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import java.util.*;
 
+@Import(TestDataSourceConfigImpl.class)
+@ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = FireStationController.class)
 public class FireStationControllerTest {
@@ -36,10 +41,10 @@ public class FireStationControllerTest {
     @Test
     public void testGetListOfHomesServedByThisStationsAndResponseIsOk() throws Exception {
         ArrayList<HouseHold> houseHoldArrayListTest = new ArrayList<>(Collections.singletonList(new HouseHold("houseTest", new ArrayList<>())));
-        ArrayList<String> stringListTest = new ArrayList<>(Arrays.asList("test","test"));
+        ArrayList<String> stringListTest = new ArrayList<>(Arrays.asList("test", "test"));
         when(fireStationService.getListOfHomesServedByThisStations(stringListTest)).thenReturn(houseHoldArrayListTest);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.addAll("stations",stringListTest);
+        params.addAll("stations", stringListTest);
         mockMvc.perform(get("/flood/stations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .params(params))
@@ -125,11 +130,23 @@ public class FireStationControllerTest {
 
     @Test
     public void testAddStationAndAddressMappingAndResponseIsCreated() throws Exception {
+        FireStation fireStationTest = new FireStation();
         String bodyContent = "{\"address\": \"TestAddress\", \"station\": \"00\"}";
+        when(fireStationService.addStationAndAddressMapping(any(FireStation.class))).thenReturn(Optional.of(fireStationTest));
         mockMvc.perform(post("/fireStation")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bodyContent))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void testAddStationAndAddressMappingAndResponseIsNotFoundBecauseAlreadyExist() throws Exception {
+        String bodyContent = "{\"address\": \"TestAddress\", \"station\": \"00\"}";
+        when(fireStationService.addStationAndAddressMapping(any(FireStation.class))).thenReturn(Optional.empty());
+        mockMvc.perform(post("/fireStation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(bodyContent))
+                .andExpect(status().isNotFound());
     }
 
     @Test

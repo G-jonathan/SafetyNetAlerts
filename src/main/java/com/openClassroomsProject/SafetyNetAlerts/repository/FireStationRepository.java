@@ -10,6 +10,8 @@ import java.util.Optional;
 @Repository
 public interface FireStationRepository extends JpaRepository<FireStation, Long> {
 
+    ArrayList<FireStation> findAll();
+
     Optional<List<FireStation>> findByStation(String stationNumber);
 
     Optional<FireStation> findByAddress(String address);

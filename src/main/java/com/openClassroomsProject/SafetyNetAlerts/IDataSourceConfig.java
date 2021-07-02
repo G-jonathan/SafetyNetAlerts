@@ -1,4 +1,4 @@
-package com.openClassroomsProject.SafetyNetAlerts.service;
+package com.openClassroomsProject.SafetyNetAlerts;
 
 import com.openClassroomsProject.SafetyNetAlerts.model.JsonFileData;
 import java.io.IOException;
