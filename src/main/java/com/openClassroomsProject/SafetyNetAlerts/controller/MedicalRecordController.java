@@ -5,6 +5,8 @@ import com.openClassroomsProject.SafetyNetAlerts.exception.ResourceNotFoundExcep
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.MedicalRecord;
 import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IMedicalRecordService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ public class MedicalRecordController {
     private IMedicalRecordService medicalRecordService;
     private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.MedicalRecordController";
 
+    @ApiOperation(value = "Retrieve the list of all medical records.")
     @GetMapping
     public ArrayList<MedicalRecord> getMedicalRecords() {
         String functionPath = CLASSPATH + ".getMedicalRecords";
@@ -36,6 +39,7 @@ public class MedicalRecordController {
         return requestContent;
     }
 
+    @ApiOperation(value = "Add a new Medical record. The person must first be registered (see POST /Person).")
     @PostMapping
     public ResponseEntity<?> addMedicalRecord(@Valid @RequestBody MedicalRecord medicalRecord) {
         String functionPath = CLASSPATH + ".addMedicalRecord";
@@ -52,6 +56,7 @@ public class MedicalRecordController {
         return new ResponseEntity<>("Person does not exist or medical file already exists ", HttpStatus.CONFLICT);
     }
 
+    @ApiOperation(value = "Update an existing medical record.")
     @PutMapping
     public ResponseEntity<?> updateAnExistingMedicalRecord(@Valid @RequestBody MedicalRecord medicalRecord) {
         String functionPath = CLASSPATH + ".updateAnExistingMedicalRecord";
@@ -68,6 +73,7 @@ public class MedicalRecordController {
         throw new ResourceNotFoundException(functionPath, "Medical record not found");
     }
 
+    @ApiOperation(value = "Delete a medical record.")
     @DeleteMapping
     public ResponseEntity<?> deleteAMedicalRecord(@Valid @RequestBody UniqueIdentifier uniqueIdentifier) {
         String functionPath = CLASSPATH + ".deleteAMedicalRecord";
