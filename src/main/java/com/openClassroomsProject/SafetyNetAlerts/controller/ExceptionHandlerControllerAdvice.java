@@ -33,7 +33,8 @@ public class ExceptionHandlerControllerAdvice {
                 .error("Internal Server Error")
                 .message(customGenericException.getException().getMessage())
                 .details("Catch in: " + customGenericException.getLocation())
-                .help("Please check Readme here: https://github.com/G-jonathan/SafetyNetAlerts")
+                .help("Please check Readme here: https://github.com/G-jonathan/SafetyNetAlerts, " +
+                        "and see the api documentation at this address: http://localhost:8080/swagger-ui.html#/")
                 .build();
     }
 
@@ -49,7 +50,8 @@ public class ExceptionHandlerControllerAdvice {
                 .error("Resource not found")
                 .message(resourceNotFoundException.getMessage())
                 .details("Catch in: " + resourceNotFoundException.getLocation())
-                .help("Please check Readme here: https://github.com/G-jonathan/SafetyNetAlerts")
+                .help("Please check Readme here: https://github.com/G-jonathan/SafetyNetAlerts, " +
+                        "and see the api documentation at this address: http://localhost:8080/swagger-ui.html#/")
                 .build();
     }
 

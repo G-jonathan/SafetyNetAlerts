@@ -7,6 +7,7 @@ import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.Person
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.FireStation;
 import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.PersonListCoveredByAFireStation;
 import com.openClassroomsProject.SafetyNetAlerts.service.IFireStationService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,8 @@ public class FireStationController {
     private IFireStationService fireStationService;
     private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.FireStationController";
 
+    @ApiOperation(value = "Retrieve a list of all homes served by the fire station(s). " +
+            "Include people name, phone number, age and medical history.")
     @GetMapping("/flood/stations")
     public ResponseEntity<ArrayList<HouseHold>> getListOfHomesServedByThisStations(@RequestParam ArrayList<String> stations) {
         String functionPath = CLASSPATH + ".getListOfHomesServedByThisStations";
@@ -41,6 +44,8 @@ public class FireStationController {
         return new ResponseEntity<>(requestContent, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Retrieve a list of person living at the given address. " +
+            "Include Fire station number, name, phone number, age and medical history.")
     @GetMapping("/fire")
     public ResponseEntity<ArrayList<PersonAndFireStationNumberWhoServedHim>> getPersonListAndHerFireStationNumber(@RequestParam String address) {
         String functionPath = CLASSPATH + ".PersonAndFireStationNumberWhoServedHim";
@@ -58,6 +63,8 @@ public class FireStationController {
         return new ResponseEntity<>(requestContent, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Retrieve a list of people covered by the corresponding fire station. " +
+            "Include name, address, phone number and a count of the number of adults and children in the service area.")
     @GetMapping("/firestation")
     public ResponseEntity<Optional<PersonListCoveredByAFireStation>> getPersonListCoveredByAFireStation(@RequestParam String fireStation) {
         String functionPath = CLASSPATH + ".getPersonListCoveredByAFireStation";
@@ -75,6 +82,7 @@ public class FireStationController {
         return new ResponseEntity<>(requestContent, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Retrieve a list of the phone numbers of the residents served by the fire station.")
     @GetMapping("/phoneAlert")
     public ResponseEntity<ArrayList<String>> getPhoneNumbersPersonServedByAFireStation(@RequestParam String fireStation) {
         String functionPath = CLASSPATH + ".getPhoneNumbersPersonServedByAFireStation";
@@ -92,6 +100,7 @@ public class FireStationController {
         return new ResponseEntity<>(requestContent, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Retrieve the list of all Fire stations.")
     @GetMapping("/fireStation")
     public ArrayList<FireStation> getFireStations() {
         String functionPath = CLASSPATH + ".getFireStations";
@@ -106,6 +115,7 @@ public class FireStationController {
         return requestContent;
     }
 
+    @ApiOperation(value = "Add a new fire Station mapping(address + fire station number).")
     @PostMapping("/fireStation")
     public ResponseEntity<?> addStationAndAddressMapping(@Valid @RequestBody FireStation firestation) {
         String functionPath = CLASSPATH + ".addStationAndAddressMapping";
@@ -122,6 +132,7 @@ public class FireStationController {
         throw new ResourceNotFoundException(functionPath, "FireStation address already exist");
     }
 
+    @ApiOperation(value = "Update the fire station number of an address.")
     @PutMapping("/fireStation")
     public ResponseEntity<?> updateFireStationNumberOfAnAddress(@Valid @RequestBody FireStation fireStation) {
         String functionPath = CLASSPATH + ".updateFireStationNumberOfAnAddress";
@@ -138,6 +149,7 @@ public class FireStationController {
         throw new ResourceNotFoundException(functionPath, "FireStation not found");
     }
 
+    @ApiOperation(value = "Delete all fire stations associated with this fire station number.")
     @DeleteMapping("/fireStation/station/{stationNumber}")
     public ResponseEntity<?> deleteMappingOfAStation(@PathVariable("stationNumber") final String stationNumber) {
         String functionPath = CLASSPATH + ".deleteMappingOfAStation";
@@ -154,6 +166,7 @@ public class FireStationController {
         throw new ResourceNotFoundException(functionPath, "Station number not found");
     }
 
+    @ApiOperation(value = "Delete the fire station associated with this address.")
     @DeleteMapping("/fireStation/address/{address}")
     public ResponseEntity<?> deleteMappingOfAnAddress(@PathVariable("address") final String address) {
         String functionPath = CLASSPATH + ".deleteMappingOfAnAddress";

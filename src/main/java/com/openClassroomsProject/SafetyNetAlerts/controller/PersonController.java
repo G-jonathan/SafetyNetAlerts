@@ -7,6 +7,7 @@ import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.Person
 import com.openClassroomsProject.SafetyNetAlerts.model.dbmodel.Person;
 import com.openClassroomsProject.SafetyNetAlerts.model.requestobjectmodel.UniqueIdentifier;
 import com.openClassroomsProject.SafetyNetAlerts.service.IPersonService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ public class PersonController {
     private IPersonService personService;
     private static final String CLASSPATH = "com.openClassroomsProject.SafetyNetAlerts.controller.PersonController";
 
+    @ApiOperation(value = "Retrieve a list of children living at this address. include children's name, age and a list of other household members")
     @GetMapping("/childAlert")
     public ResponseEntity<ChildrenAndOtherMembers> getListOfChildrenLivingAtThisAddress(@RequestParam String address) {
         String functionPath = CLASSPATH + ".getListOfChildrenLivingAtThisAddress";
@@ -41,6 +43,7 @@ public class PersonController {
         return new ResponseEntity<>(childrenAndOtherMembers, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Retrieve information about a person. Include name, address, age, mail, and medical history.")
     @GetMapping("/personInfo")
     public ResponseEntity<PersonInformation> getPersonInformation(@RequestParam String firstName, @RequestParam String lastName) {
         String functionPath = CLASSPATH + ".getPersonInformation";
@@ -59,6 +62,7 @@ public class PersonController {
         return new ResponseEntity<>(requestContent, HttpStatus.OK);
     }
 
+    @ApiOperation(value = " Retrieve the email of all the people living in the city.")
     @GetMapping("/communityEmail")
     public ResponseEntity<ArrayList<String>> getEmailsOfCityDwellers(@RequestParam String city) {
         String functionPath = CLASSPATH + ".getEmailsFromCityDwellers";
@@ -76,6 +80,7 @@ public class PersonController {
         return new ResponseEntity<>(requestContent, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Retrieve a list of all persons.")
     @GetMapping("/person")
     public ArrayList<Person> getPersons() {
         String functionPath = CLASSPATH + ".getPersons";
@@ -90,6 +95,7 @@ public class PersonController {
         return requestContent;
     }
 
+    @ApiOperation(value = "Add a new person.")
     @PostMapping("/person")
     public ResponseEntity<?> addNewPerson(@Valid @RequestBody Person person) {
         String functionPath = CLASSPATH + ".addNewPerson";
@@ -106,6 +112,7 @@ public class PersonController {
         throw new ResourceNotFoundException(functionPath, "Person Already exist");
     }
 
+    @ApiOperation(value = "Update an existing person.")
     @PutMapping("/person")
     public ResponseEntity<?> updateAnExistingPerson(@Valid @RequestBody Person person) {
         String functionPath = CLASSPATH + ".updateAnExistingPerson";
@@ -122,6 +129,7 @@ public class PersonController {
         throw new ResourceNotFoundException(functionPath, "Person not found");
     }
 
+    @ApiOperation(value = "Delete a person.")
     @DeleteMapping("/person")
     public ResponseEntity<?> deleteAPerson(@Valid @RequestBody UniqueIdentifier uniqueIdentifier) {
         String functionPath = CLASSPATH + ".deleteAPerson";
